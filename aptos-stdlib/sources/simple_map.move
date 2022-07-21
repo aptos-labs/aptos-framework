@@ -4,11 +4,11 @@
 /// 3) A Key can be found within O(Log N) time
 /// 4) The data is stored as a sorted by Key
 /// 5) Adds and removals take O(N) time
-module aptos_framework::simple_map {
-    use std::errors;
+module aptos_std::simple_map {
+    use std::error;
     use std::option;
     use std::vector;
-    use aptos_framework::comparator;
+    use aptos_std::comparator;
 
     const EKEY_ALREADY_EXISTS: u64 = 0;
     const EKEY_NOT_FOUND: u64 = 1;
@@ -37,7 +37,7 @@ module aptos_framework::simple_map {
         key: &Key,
     ): &Value {
         let (maybe_idx, _) = find(map, key);
-        assert!(option::is_some(&maybe_idx), errors::invalid_argument(EKEY_NOT_FOUND));
+        assert!(option::is_some(&maybe_idx), error::invalid_argument(EKEY_NOT_FOUND));
         let idx = option::extract(&mut maybe_idx);
         &vector::borrow(&map.data, idx).value
     }
@@ -47,7 +47,7 @@ module aptos_framework::simple_map {
         key: &Key,
     ): &mut Value {
         let (maybe_idx, _) = find(map, key);
-        assert!(option::is_some(&maybe_idx), errors::invalid_argument(EKEY_NOT_FOUND));
+        assert!(option::is_some(&maybe_idx), error::invalid_argument(EKEY_NOT_FOUND));
         let idx = option::extract(&mut maybe_idx);
         &mut vector::borrow_mut(&mut map.data, idx).value
     }
@@ -71,7 +71,7 @@ module aptos_framework::simple_map {
         value: Value,
     ) {
         let (maybe_idx, maybe_placement) = find(map, &key);
-        assert!(option::is_none(&maybe_idx), errors::invalid_argument(EKEY_ALREADY_EXISTS));
+        assert!(option::is_none(&maybe_idx), error::invalid_argument(EKEY_ALREADY_EXISTS));
 
         // Append to the end and then swap elements until the list is ordered again
         vector::push_back(&mut map.data, Element { key, value });
@@ -89,7 +89,7 @@ module aptos_framework::simple_map {
         key: &Key,
     ): (Key, Value) {
         let (maybe_idx, _) = find(map, key);
-        assert!(option::is_some(&maybe_idx), errors::invalid_argument(EKEY_NOT_FOUND));
+        assert!(option::is_some(&maybe_idx), error::invalid_argument(EKEY_NOT_FOUND));
 
         let placement = option::extract(&mut maybe_idx);
         let end = vector::length(&map.data) - 1;

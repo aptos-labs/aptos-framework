@@ -1,5 +1,5 @@
 /// Provides a framework for comparing two elements
-module aptos_framework::comparator {
+module aptos_std::comparator {
     use std::bcs;
     use std::vector;
 
