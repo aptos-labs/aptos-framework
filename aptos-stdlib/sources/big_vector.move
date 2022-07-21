@@ -1,7 +1,7 @@
-module aptos_framework::big_vector {
-    use std::errors;
+module aptos_std::big_vector {
+    use std::error;
     use std::vector;
-    use aptos_framework::table::{Self, Table};
+    use aptos_std::table::{Self, Table};
 
     /// The index into the vector is out of bounds
     const EINDEX_OUT_OF_BOUNDS: u64 = 0;
@@ -50,7 +50,7 @@ module aptos_framework::big_vector {
     /// Destroy the vector `v`.
     /// Aborts if `v` is not empty.
     public fun destroy_empty<T>(v: BigVector<T>) {
-        assert!(is_empty(&v), errors::invalid_argument(ENOT_EMPTY));
+        assert!(is_empty(&v), error::invalid_argument(ENOT_EMPTY));
         shrink_to_fit(&mut v);
         let BigVector { buckets, end_index: _, num_buckets: _, bucket_size: _ } = v;
         table::destroy_empty(buckets);
@@ -72,7 +72,7 @@ module aptos_framework::big_vector {
     /// It can split the gas responsibility between user of the vector and owner of the vector.
     /// Call `reserve` to explicit add more buckets.
     public fun push_back_no_grow<T>(v: &mut BigVector<T>, val: T) {
-        assert!(v.end_index.bucket_index < v.num_buckets, errors::invalid_argument(EOUT_OF_CAPACITY));
+        assert!(v.end_index.bucket_index < v.num_buckets, error::invalid_argument(EOUT_OF_CAPACITY));
         vector::push_back(table::borrow_mut(&mut v.buckets, v.end_index.bucket_index), val);
         increment_index(&mut v.end_index, v.bucket_size);
     }
@@ -81,7 +81,7 @@ module aptos_framework::big_vector {
     /// Call `shrink_to_fit` explicity to deallocate empty buckets.
     /// Aborts if `v` is empty.
     public fun pop_back<T>(v: &mut BigVector<T>): T {
-        assert!(!is_empty(v), errors::invalid_argument(EINDEX_OUT_OF_BOUNDS));
+        assert!(!is_empty(v), error::invalid_argument(EINDEX_OUT_OF_BOUNDS));
         decrement_index(&mut v.end_index, v.bucket_size);
         let val = vector::pop_back(table::borrow_mut(&mut v.buckets, v.end_index.bucket_index));
         val
