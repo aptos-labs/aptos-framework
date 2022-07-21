@@ -1,4 +1,4 @@
-module aptos_framework::type_info {
+module aptos_std::type_info {
     struct TypeInfo has copy, drop, store {
         account_address: address,
         module_name: vector<u8>,
@@ -22,7 +22,7 @@ module aptos_framework::type_info {
     #[test]
     fun test() {
         let type_info = type_of<TypeInfo>();
-        assert!(account_address(&type_info) == @aptos_framework, 0);
+        assert!(account_address(&type_info) == @aptos_std, 0);
         assert!(module_name(&type_info) == b"type_info", 1);
         assert!(struct_name(&type_info) == b"TypeInfo", 2);
     }
