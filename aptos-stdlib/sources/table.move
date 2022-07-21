@@ -5,12 +5,12 @@
 /// be represented by separate global state items. The number of items and a unique handle are tracked on the table
 /// struct itself, while the operations are implemented as native functions. No traversal is provided.
 
-module aptos_framework::table {
-    use std::errors;
+module aptos_std::table {
+    use std::error;
 
-    // native code raises this with errors::invalid_arguments()
+    // native code raises this with error::invalid_arguments()
     const EALREADY_EXISTS: u64 = 100;
-    // native code raises this with errors::invalid_arguments()
+    // native code raises this with error::invalid_arguments()
     const ENOT_FOUND: u64 = 101;
     const ENOT_EMPTY: u64 = 102;
 
@@ -30,7 +30,7 @@ module aptos_framework::table {
 
     /// Destroy a table. The table must be empty to succeed.
     public fun destroy_empty<K: copy + drop, V>(table: Table<K, V>) {
-        assert!(table.length == 0, errors::invalid_state(ENOT_EMPTY));
+        assert!(table.length == 0, error::invalid_state(ENOT_EMPTY));
         destroy_empty_box<K, V, Box<V>>(&table);
         drop_unchecked_box<K, V, Box<V>>(table)
     }
