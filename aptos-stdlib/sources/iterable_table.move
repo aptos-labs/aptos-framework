@@ -1,6 +1,6 @@
-module aptos_framework::iterable_table {
+module aptos_std::iterable_table {
     use std::option::{Self, Option};
-    use aptos_framework::table::{Self, Table};
+    use aptos_std::table::{Self, Table};
 
     /// The iterable wrapper around value, points to previous and next key if any.
     struct IterableValue<K: copy + store + drop, V: store> has store {
