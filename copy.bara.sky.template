@@ -1,0 +1,25 @@
+core.workflow(
+    name = "push_move_libraries_direct",
+    origin = git.github_origin(
+        url = "https://github.com/aptos-labs/aptos-core.git",
+        ref = "PLACEHOLDER_BRANCH",
+    ),
+    destination = git.github_destination(
+        url = "https://github.com/aptos-labs/aptos-framework.git",
+        push = "PLACEHOLDER_BRANCH",
+    ),
+    mode = "ITERATIVE",
+    origin_files = glob([
+        "aptos-move/framework/move-stdlib/**",
+        "aptos-move/framework/aptos-framework/**",
+        "aptos-move/framework/aptos-names/**",
+        "aptos-move/framework/aptos-stdlib/**",
+        "aptos-move/framework/aptos-token/**",
+        "aptos-move/framework/aptos-token-object/**",
+    ]),
+    destination_files = glob(["**"]),
+    authoring = authoring.pass_thru("Victor <victor@aptoslabs.com>"),
+    transformations = [
+        core.move("aptos-move/framework", ""),
+    ],
+)

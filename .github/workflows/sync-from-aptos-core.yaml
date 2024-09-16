@@ -1,0 +1,72 @@
+name: Sync from aptos-core
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+# env:
+  # GH_TOKEN: ${{ github.token }}
+
+jobs:
+  sync:
+    runs-on: runs-on,runner=2cpu-linux-x64,run-id=${{ github.run_id }}
+    steps:
+      # Set up the git credentials for the job (using the aptos-bot personal access token)
+      - uses: oleksiyrudenko/gha-git-credentials@v2.1.1
+        with:
+          global: true
+          name: "aptos-bot"
+          token: ${{ secrets.APTOS_BOT_CLONE_GH_PAT }}
+
+      # Reconfigure the git url and credentials such that calling 'git clone <URL>' will work
+      - name: Set github url and credentials
+        run: |
+          /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf ssh://git@github
+          /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf https://github
+          /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf git@github
+     
+      - uses: bazel-contrib/setup-bazel@0.8.5
+        with:
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
+          bazelisk-version: 1.x
+
+      - name: Checkout copybara
+        uses: actions/checkout@v4
+        with:
+          repository: google/copybara
+          path: copybara
+
+      - name: Build copybara
+        working-directory: copybara
+        run: |
+          set -x
+          bazel build //java/com/google/copybara:copybara_deploy.jar
+          cp bazel-bin/java/com/google/copybara/copybara_deploy.jar /usr/local/bin/
+          cat <<'EOF' > /usr/local/bin/copybara
+            #!/bin/bash -e
+
+            java -jar /usr/local/bin/copybara_deploy.jar "$@"
+          EOF
+
+          chmod +x /usr/local/bin/copybara
+
+      - name: Checkout aptos-framework
+        uses: actions/checkout@v4
+        with:
+          path: aptos-framework
+      
+      - name: Sync all branches
+        working-directory: aptos-framework
+        run: |
+          set -x
+          PATH=$PATH:/usr/local/bin/
+          ./sync.sh
+
