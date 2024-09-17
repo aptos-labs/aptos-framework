@@ -1,6 +1,7 @@
 name: Sync from aptos-core
 
 on:
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -8,7 +9,7 @@ permissions:
   id-token: write
 
 # env:
-  # GH_TOKEN: ${{ github.token }}
+# GH_TOKEN: ${{ github.token }}
 
 jobs:
   sync:
@@ -27,7 +28,7 @@ jobs:
           /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf ssh://git@github
           /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf https://github
           /usr/bin/git config --global --add url."https://${{ secrets.APTOS_BOT_CLONE_GH_PAT }}:x-oauth-basic@github".insteadOf git@github
-     
+
       - uses: bazel-contrib/setup-bazel@0.8.5
         with:
           # Avoid downloading Bazel every time.
@@ -58,15 +59,17 @@ jobs:
 
           chmod +x /usr/local/bin/copybara
 
-      - name: Checkout aptos-framework
-        uses: actions/checkout@v4
-        with:
-          path: aptos-framework
-      
       - name: Sync all branches
-        working-directory: aptos-framework
+        env:
+          GH_TOKEN: ${{ secrets.APTOS_BOT_CLONE_GH_PAT }}
         run: |
-          set -x
-          PATH=$PATH:/usr/local/bin/
-          ./sync.sh
+          set -ex -o pipefail
 
+          gh auth setup-git
+
+          gh repo clone aptos-labs/aptos-framework
+
+          PATH=$PATH:/usr/local/bin/
+          cd aptos-framework
+
+          ./sync.sh

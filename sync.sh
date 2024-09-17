@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex -o pipefail
 
 SOURCE_REPO_URL="https://github.com/aptos-labs/aptos-core.git"
 DESTINATION_REPO_URL="https://github.com/aptos-labs/aptos-framework.git"
