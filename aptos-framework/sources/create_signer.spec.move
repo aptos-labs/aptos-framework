@@ -41,8 +41,5 @@ spec aptos_framework::create_signer {
         pragma opaque;
         aborts_if [abstract] false;
         ensures [abstract] signer::address_of(result) == addr;
-        ensures [abstract] result == spec_create_signer(addr);
     }
-
-    spec fun spec_create_signer(addr: address): signer;
 }

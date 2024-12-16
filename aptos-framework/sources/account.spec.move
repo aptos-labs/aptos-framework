@@ -105,9 +105,8 @@ spec aptos_framework::account {
     ///
 
     spec module {
-        pragma verify = false;
-
-
+        pragma verify = true;
+        pragma aborts_if_is_strict;
     }
 
     /// Only the address `@aptos_framework` can call.
@@ -391,6 +390,7 @@ spec aptos_framework::account {
             source_address,
             recipient_address,
         };
+
         aborts_if !exists<chain_id::ChainId>(@aptos_framework);
         aborts_if !exists<Account>(recipient_address);
         aborts_if !exists<Account>(source_address);

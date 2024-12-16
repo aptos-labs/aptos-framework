@@ -46,14 +46,7 @@ spec aptos_framework::object {
     /// </high-level-req>
     ///
     spec module {
-        pragma aborts_if_is_partial;
-    }
-
-    spec grant_permission {
-        pragma aborts_if_is_partial;
-        aborts_if !permissioned_signer::spec_is_permissioned_signer(permissioned_signer);
-        aborts_if permissioned_signer::spec_is_permissioned_signer(master);
-        aborts_if signer::address_of(master) != signer::address_of(permissioned_signer);
+        pragma aborts_if_is_strict;
     }
 
     spec fun spec_exists_at<T: key>(object: address): bool;
