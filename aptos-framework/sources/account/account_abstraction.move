@@ -21,8 +21,6 @@ module aptos_framework::account_abstraction {
     const EFUNCTION_INFO_EXISTENCE: u64 = 2;
     const EAUTH_FUNCTION_SIGNATURE_MISMATCH: u64 = 3;
     const ENOT_MASTER_SIGNER: u64 = 4;
-    const EINCONSISTENT_SIGNER_ADDRESS: u64 = 5;
-    const EDEPRECATED_FUNCTION: u64 = 6;
 
     const MAX_U64: u128 = 18446744073709551615;
 
@@ -45,9 +43,9 @@ module aptos_framework::account_abstraction {
         V1 { auth_functions: OrderedMap<FunctionInfo, bool> }
     }
 
-    /// Add dispatchable authentication function that enables account abstraction via this function.
+    /// Update dispatchable authenticator that enables account abstraction.
     /// Note: it is a private entry function that can only be called directly from transaction.
-    entry fun add_authentication_function(
+    public entry fun add_dispatchable_authentication_function(
         account: &signer,
         module_address: address,
         module_name: String,
@@ -61,9 +59,7 @@ module aptos_framework::account_abstraction {
         );
     }
 
-    /// Remove dispatchable authentication function that enables account abstraction via this function.
-    /// Note: it is a private entry function that can only be called directly from transaction.
-    entry fun remove_authentication_function(
+    public entry fun remove_dispatchable_authentication_function(
         account: &signer,
         module_address: address,
         module_name: String,
@@ -77,10 +73,9 @@ module aptos_framework::account_abstraction {
         );
     }
 
-    /// Remove dispatchable authenticator so that all dispatchable authentication functions will be removed as well.
-    /// After calling this function, the account is not abstracted at all.
+    /// Update dispatchable authenticator that disables account abstraction.
     /// Note: it is a private entry function that can only be called directly from transaction.
-    entry fun remove_authenticator(
+    public entry fun remove_dispatchable_authenticator(
         account: &signer,
     ) acquires DispatchableAuthenticator {
         assert!(!is_permissioned_signer(account), error::permission_denied(ENOT_MASTER_SIGNER));
@@ -120,31 +115,32 @@ module aptos_framework::account_abstraction {
                 DispatchableAuthenticator::V1 { auth_functions: ordered_map::new() }
             );
         };
-        assert!(exists<DispatchableAuthenticator>(resource_addr), error::not_found(EFUNCTION_INFO_EXISTENCE));
-        let current_map = &mut borrow_global_mut<DispatchableAuthenticator>(resource_addr).auth_functions;
-        if (is_add) {
-            assert!(
-                !ordered_map::contains(current_map, &auth_function),
-                error::already_exists(EFUNCTION_INFO_EXISTENCE)
+        if (exists<DispatchableAuthenticator>(resource_addr)) {
+            let current_map = &mut borrow_global_mut<DispatchableAuthenticator>(resource_addr).auth_functions;
+            if (is_add) {
+                assert!(
+                    !ordered_map::contains(current_map, &auth_function),
+                    error::already_exists(EFUNCTION_INFO_EXISTENCE)
+                );
+                ordered_map::add(current_map, auth_function, true);
+            } else {
+                assert!(
+                    ordered_map::contains(current_map, &auth_function),
+                    error::not_found(EFUNCTION_INFO_EXISTENCE)
+                );
+                ordered_map::remove(current_map, &auth_function);
+            };
+            event::emit(
+                UpdateDispatchableAuthenticator {
+                    account: addr,
+                    update: if (is_add) { b"add" } else { b"remove" },
+                    auth_function,
+                }
             );
-            ordered_map::add(current_map, auth_function, true);
-        } else {
-            assert!(
-                ordered_map::contains(current_map, &auth_function),
-                error::not_found(EFUNCTION_INFO_EXISTENCE)
-            );
-            ordered_map::remove(current_map, &auth_function);
-        };
-        event::emit(
-            UpdateDispatchableAuthenticator {
-                account: addr,
-                update: if (is_add) { b"add" } else { b"remove" },
-                auth_function,
+            if (ordered_map::length(current_map) == 0) {
+                remove_dispatchable_authenticator(account);
             }
-        );
-        if (ordered_map::length(current_map) == 0) {
-                remove_authenticator(account);
-        }
+        };
     }
 
     #[view]
@@ -174,17 +170,10 @@ module aptos_framework::account_abstraction {
         func_info: FunctionInfo,
         signing_data: AbstractionAuthData,
     ): signer acquires DispatchableAuthenticator {
-        let master_signer_addr = signer::address_of(&account);
-        let func_infos = dispatchable_authenticator_internal(master_signer_addr);
+        let func_infos = dispatchable_authenticator_internal(signer::address_of(&account));
         assert!(ordered_map::contains(func_infos, &func_info), error::not_found(EFUNCTION_INFO_EXISTENCE));
         function_info::load_module_from_function(&func_info);
-        let returned_signer = dispatchable_authenticate(account, signing_data, &func_info);
-        // Returned signer MUST represent the same account address. Otherwise, it may break the invariant of Aptos blockchain!
-        assert!(
-            master_signer_addr == signer::address_of(&returned_signer),
-            error::invalid_state(EINCONSISTENT_SIGNER_ADDRESS)
-        );
-        returned_signer
+        dispatchable_authenticate(account, signing_data, &func_info)
     }
 
     /// The native function to dispatch customized move authentication function.
@@ -201,41 +190,14 @@ module aptos_framework::account_abstraction {
         let bob_addr = signer::address_of(bob);
         create_account_for_test(bob_addr);
         assert!(!using_dispatchable_authenticator(bob_addr), 0);
-        add_authentication_function(
+        add_dispatchable_authentication_function(
             bob,
             @aptos_framework,
             string::utf8(b"account_abstraction_tests"),
             string::utf8(b"test_auth")
         );
         assert!(using_dispatchable_authenticator(bob_addr), 0);
-        remove_authenticator(bob);
+        remove_dispatchable_authenticator(bob);
         assert!(!using_dispatchable_authenticator(bob_addr), 0);
-    }
-
-    #[deprecated]
-    public entry fun add_dispatchable_authentication_function(
-        _account: &signer,
-        _module_address: address,
-        _module_name: String,
-        _function_name: String,
-    ) {
-        abort std::error::unavailable(EDEPRECATED_FUNCTION)
-    }
-
-    #[deprecated]
-    public entry fun remove_dispatchable_authentication_function(
-        _account: &signer,
-        _module_address: address,
-        _module_name: String,
-        _function_name: String,
-    ) {
-        abort std::error::unavailable(EDEPRECATED_FUNCTION)
-    }
-
-    #[deprecated]
-    public entry fun remove_dispatchable_authenticator(
-        _account: &signer,
-    ) {
-        abort std::error::unavailable(EDEPRECATED_FUNCTION)
     }
 }

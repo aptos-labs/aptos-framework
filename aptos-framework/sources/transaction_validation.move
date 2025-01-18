@@ -454,13 +454,10 @@ module aptos_framework::transaction_validation {
             vector::map(secondary_signer_public_key_hashes, |x| option::some(x)),
             is_simulation
         );
-        if (!features::transaction_simulation_enhancement_enabled() ||
-            !skip_auth_key_check(is_simulation, &option::some(fee_payer_public_key_hash))) {
-            assert!(
-                fee_payer_public_key_hash == account::get_authentication_key(fee_payer_address),
-                error::invalid_argument(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY),
-            )
-        }
+        assert!(
+            fee_payer_public_key_hash == account::get_authentication_key(fee_payer_address),
+            error::invalid_argument(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY),
+        )
     }
 
     /// Epilogue function is run after a transaction is successfully executed.
