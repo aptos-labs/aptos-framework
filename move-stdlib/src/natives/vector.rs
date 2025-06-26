@@ -1,4 +1,4 @@
-// Copyright © Aptos Foundation
+// Copyright © Cedra Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Copyright (c) The Diem Core Contributors
@@ -7,14 +7,14 @@
 
 //! Implementation of native functions (non-bytecode instructions) for vector.
 
-use aptos_gas_schedule::gas_params::natives::move_stdlib::{
+use cedra_gas_schedule::gas_params::natives::move_stdlib::{
     VECTOR_MOVE_RANGE_BASE, VECTOR_MOVE_RANGE_PER_INDEX_MOVED,
 };
-use aptos_native_interface::{
+use cedra_native_interface::{
     safely_pop_arg, RawSafeNative, SafeNativeBuilder, SafeNativeContext, SafeNativeError,
     SafeNativeResult,
 };
-use aptos_types::error;
+use cedra_types::error;
 use move_core_types::gas_algebra::NumArgs;
 use move_vm_runtime::native_functions::NativeFunction;
 use move_vm_types::{

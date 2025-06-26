@@ -1,4 +1,4 @@
-// Copyright © Aptos Foundation
+// Copyright © Cedra Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Copyright (c) The Diem Core Contributors
@@ -7,8 +7,8 @@
 
 //! Implementation of native functions for utf8 strings.
 
-use aptos_gas_schedule::gas_params::natives::move_stdlib::*;
-use aptos_native_interface::{
+use cedra_gas_schedule::gas_params::natives::move_stdlib::*;
+use cedra_native_interface::{
     safely_pop_arg, RawSafeNative, SafeNativeBuilder, SafeNativeContext, SafeNativeResult,
 };
 use move_core_types::gas_algebra::NumBytes;
@@ -100,7 +100,7 @@ fn native_sub_string(
 
     if j < i {
         // TODO: The abort code should follow the error convention.
-        return Err(aptos_native_interface::SafeNativeError::Abort { abort_code: 1 });
+        return Err(cedra_native_interface::SafeNativeError::Abort { abort_code: 1 });
     }
 
     context.charge(STRING_SUB_STRING_PER_BYTE * NumBytes::new((j - i) as u64))?;

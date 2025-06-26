@@ -62,4 +62,4 @@ as in the Move prover's prelude.
 </details>
 
 
-[move-book]: https://aptos.dev/move/book/SUMMARY
+[move-book]: https://cedra.dev/move/book/SUMMARY

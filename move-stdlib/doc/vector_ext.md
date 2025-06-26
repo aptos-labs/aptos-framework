@@ -198,4 +198,4 @@ Aborts if <code>i</code> is out of bounds.
 </details>
 
 
-[move-book]: https://aptos.dev/move/book/SUMMARY
+[move-book]: https://cedra.dev/move/book/SUMMARY

@@ -28,4 +28,4 @@ For on overview of the Move language, see the [Move Book][move-book].
 -  [`0x1::vector`](vector.md#0x1_vector)
 
 
-[move-book]: https://aptos.dev/move/book/SUMMARY
+[move-book]: https://cedra.dev/move/book/SUMMARY

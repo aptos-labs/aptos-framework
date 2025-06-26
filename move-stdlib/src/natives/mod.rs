@@ -1,4 +1,4 @@
-// Copyright © Aptos Foundation
+// Copyright © Cedra Foundation
 // SPDX-License-Identifier: Apache-2.0
 
 // Copyright (c) The Diem Core Contributors
@@ -15,7 +15,7 @@ pub mod string;
 pub mod unit_test;
 pub mod vector;
 
-use aptos_native_interface::SafeNativeBuilder;
+use cedra_native_interface::SafeNativeBuilder;
 use move_core_types::account_address::AccountAddress;
 use move_vm_runtime::native_functions::{make_table_from_iter, NativeFunctionTable};
 

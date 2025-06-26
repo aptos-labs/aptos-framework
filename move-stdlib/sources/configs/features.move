@@ -1,5 +1,5 @@
-/// Defines feature flags for Aptos. Those are used in Aptos specific implementations of features in
-/// the Move stdlib, the Aptos stdlib, and the Aptos framework.
+/// Defines feature flags for Cedra. Those are used in Cedra specific implementations of features in
+/// the Move stdlib, the Cedra stdlib, and the Cedra framework.
 ///
 /// ============================================================================================
 /// Feature Flag Definitions
@@ -64,15 +64,15 @@ module std::features {
         is_enabled(SHA_512_AND_RIPEMD_160_NATIVES)
     }
 
-    /// Whether the new `aptos_stdlib::type_info::chain_id()` native for fetching the chain ID is enabled.
+    /// Whether the new `cedra_stdlib::type_info::chain_id()` native for fetching the chain ID is enabled.
     /// This is needed because of the introduction of a new native function.
     /// Lifetime: transient
-    const APTOS_STD_CHAIN_ID_NATIVES: u64 = 4;
+    const CEDRA_STD_CHAIN_ID_NATIVES: u64 = 4;
 
-    public fun get_aptos_stdlib_chain_id_feature(): u64 { APTOS_STD_CHAIN_ID_NATIVES }
+    public fun get_cedra_stdlib_chain_id_feature(): u64 { CEDRA_STD_CHAIN_ID_NATIVES }
 
-    public fun aptos_stdlib_chain_id_enabled(): bool acquires Features {
-        is_enabled(APTOS_STD_CHAIN_ID_NATIVES)
+    public fun cedra_stdlib_chain_id_enabled(): bool acquires Features {
+        is_enabled(CEDRA_STD_CHAIN_ID_NATIVES)
     }
 
     /// Whether to allow the use of binary format version v6.
@@ -99,7 +99,7 @@ module std::features {
         false
     }
 
-    /// Whether the new `aptos_stdlib::multi_ed25519::public_key_validate_internal_v2()` native is enabled.
+    /// Whether the new `cedra_stdlib::multi_ed25519::public_key_validate_internal_v2()` native is enabled.
     /// This is needed because of the introduction of a new native function.
     /// Lifetime: transient
     const MULTI_ED25519_PK_VALIDATE_V2_NATIVES: u64 = 7;
@@ -192,7 +192,7 @@ module std::features {
         is_enabled(PERIODICAL_REWARD_RATE_DECREASE)
     }
 
-    /// Whether enable paritial governance voting on aptos_governance.
+    /// Whether enable paritial governance voting on cedra_governance.
     /// Lifetime: transient
     const PARTIAL_GOVERNANCE_VOTING: u64 = 17;
 
@@ -226,7 +226,7 @@ module std::features {
 
     /// Whether enable MOVE functions to call create_auid method to create AUIDs.
     /// Lifetime: transient
-    const APTOS_UNIQUE_IDENTIFIERS: u64 = 23;
+    const CEDRA_UNIQUE_IDENTIFIERS: u64 = 23;
 
     public fun get_auids(): u64 {
         error::invalid_argument(EFEATURE_CANNOT_BE_DISABLED)
@@ -363,7 +363,7 @@ module std::features {
         is_enabled(BN254_STRUCTURES)
     }
 
-    /// Deprecated by `aptos_framework::randomness_config::RandomnessConfig`.
+    /// Deprecated by `cedra_framework::randomness_config::RandomnessConfig`.
     const RECONFIGURE_WITH_DKG: u64 = 45;
 
     public fun get_reconfigure_with_dkg_feature(): u64 { RECONFIGURE_WITH_DKG }
@@ -394,7 +394,7 @@ module std::features {
         is_enabled(KEYLESS_BUT_ZKLESS_ACCOUNTS)
     }
 
-    /// Deprecated by `aptos_framework::jwk_consensus_config::JWKConsensusConfig`.
+    /// Deprecated by `cedra_framework::jwk_consensus_config::JWKConsensusConfig`.
     const JWK_CONSENSUS: u64 = 49;
 
     public fun get_jwk_consensus_feature(): u64 { JWK_CONSENSUS }
@@ -462,7 +462,7 @@ module std::features {
         is_enabled(DELEGATION_POOL_ALLOWLISTING)
     }
 
-    /// Whether aptos_framwork enables the behavior of module event migration.
+    /// Whether cedra_framwork enables the behavior of module event migration.
     ///
     /// Lifetime: transient
     const MODULE_EVENT_MIGRATION: u64 = 57;
@@ -496,17 +496,17 @@ module std::features {
         is_enabled(COIN_TO_FUNGIBLE_ASSET_MIGRATION)
     }
 
-    const PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS: u64 = 61;
+    const PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS: u64 = 61;
 
     #[deprecated]
-    public fun get_primary_apt_fungible_store_at_user_address_feature(
+    public fun get_primary_cedra_fungible_store_at_user_address_feature(
     ): u64 {
         abort error::invalid_argument(EINVALID_FEATURE)
     }
 
     #[deprecated]
-    public fun primary_apt_fungible_store_at_user_address_enabled(): bool acquires Features {
-        is_enabled(PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS)
+    public fun primary_cedra_fungible_store_at_user_address_enabled(): bool acquires Features {
+        is_enabled(PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS)
     }
 
     const AGGREGATOR_V2_IS_AT_LEAST_API: u64 = 66;
@@ -536,21 +536,21 @@ module std::features {
     }
 
     /// Lifetime: transient
-    const NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE: u64 = 64;
+    const NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE: u64 = 64;
 
-    public fun get_new_accounts_default_to_fa_apt_store_feature(): u64 { NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE }
+    public fun get_new_accounts_default_to_fa_cedra_store_feature(): u64 { NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE }
 
-    public fun new_accounts_default_to_fa_apt_store_enabled(): bool acquires Features {
-        is_enabled(NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE)
+    public fun new_accounts_default_to_fa_cedra_store_enabled(): bool acquires Features {
+        is_enabled(NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE)
     }
 
     /// Lifetime: transient
-    const OPERATIONS_DEFAULT_TO_FA_APT_STORE: u64 = 65;
+    const OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE: u64 = 65;
 
-    public fun get_operations_default_to_fa_apt_store_feature(): u64 { OPERATIONS_DEFAULT_TO_FA_APT_STORE }
+    public fun get_operations_default_to_fa_cedra_store_feature(): u64 { OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE }
 
-    public fun operations_default_to_fa_apt_store_enabled(): bool acquires Features {
-        is_enabled(OPERATIONS_DEFAULT_TO_FA_APT_STORE)
+    public fun operations_default_to_fa_cedra_store_enabled(): bool acquires Features {
+        is_enabled(OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE)
     }
 
     /// Whether enable concurent Fungible Balance

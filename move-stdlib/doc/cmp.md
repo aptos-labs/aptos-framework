@@ -278,4 +278,4 @@ and if equal we proceed to the next.
 </code></pre>
 
 
-[move-book]: https://aptos.dev/move/book/SUMMARY
+[move-book]: https://cedra.dev/move/book/SUMMARY

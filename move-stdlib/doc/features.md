@@ -3,8 +3,8 @@
 
 # Module `0x1::features`
 
-Defines feature flags for Aptos. Those are used in Aptos specific implementations of features in
-the Move stdlib, the Aptos stdlib, and the Aptos framework.
+Defines feature flags for Cedra. Those are used in Cedra specific implementations of features in
+the Move stdlib, the Cedra stdlib, and the Cedra framework.
 
 ============================================================================================
 Feature Flag Definitions
@@ -36,8 +36,8 @@ return true.
 -  [Function `treat_friend_as_private`](#0x1_features_treat_friend_as_private)
 -  [Function `get_sha_512_and_ripemd_160_feature`](#0x1_features_get_sha_512_and_ripemd_160_feature)
 -  [Function `sha_512_and_ripemd_160_enabled`](#0x1_features_sha_512_and_ripemd_160_enabled)
--  [Function `get_aptos_stdlib_chain_id_feature`](#0x1_features_get_aptos_stdlib_chain_id_feature)
--  [Function `aptos_stdlib_chain_id_enabled`](#0x1_features_aptos_stdlib_chain_id_enabled)
+-  [Function `get_cedra_stdlib_chain_id_feature`](#0x1_features_get_cedra_stdlib_chain_id_feature)
+-  [Function `cedra_stdlib_chain_id_enabled`](#0x1_features_cedra_stdlib_chain_id_enabled)
 -  [Function `get_vm_binary_format_v6`](#0x1_features_get_vm_binary_format_v6)
 -  [Function `allow_vm_binary_format_v6`](#0x1_features_allow_vm_binary_format_v6)
 -  [Function `get_collect_and_distribute_gas_fees_feature`](#0x1_features_get_collect_and_distribute_gas_fees_feature)
@@ -112,17 +112,17 @@ return true.
 -  [Function `transaction_context_extension_enabled`](#0x1_features_transaction_context_extension_enabled)
 -  [Function `get_coin_to_fungible_asset_migration_feature`](#0x1_features_get_coin_to_fungible_asset_migration_feature)
 -  [Function `coin_to_fungible_asset_migration_feature_enabled`](#0x1_features_coin_to_fungible_asset_migration_feature_enabled)
--  [Function `get_primary_apt_fungible_store_at_user_address_feature`](#0x1_features_get_primary_apt_fungible_store_at_user_address_feature)
--  [Function `primary_apt_fungible_store_at_user_address_enabled`](#0x1_features_primary_apt_fungible_store_at_user_address_enabled)
+-  [Function `get_primary_cedra_fungible_store_at_user_address_feature`](#0x1_features_get_primary_cedra_fungible_store_at_user_address_feature)
+-  [Function `primary_cedra_fungible_store_at_user_address_enabled`](#0x1_features_primary_cedra_fungible_store_at_user_address_enabled)
 -  [Function `aggregator_v2_is_at_least_api_enabled`](#0x1_features_aggregator_v2_is_at_least_api_enabled)
 -  [Function `get_object_native_derived_address_feature`](#0x1_features_get_object_native_derived_address_feature)
 -  [Function `object_native_derived_address_enabled`](#0x1_features_object_native_derived_address_enabled)
 -  [Function `get_dispatchable_fungible_asset_feature`](#0x1_features_get_dispatchable_fungible_asset_feature)
 -  [Function `dispatchable_fungible_asset_enabled`](#0x1_features_dispatchable_fungible_asset_enabled)
--  [Function `get_new_accounts_default_to_fa_apt_store_feature`](#0x1_features_get_new_accounts_default_to_fa_apt_store_feature)
--  [Function `new_accounts_default_to_fa_apt_store_enabled`](#0x1_features_new_accounts_default_to_fa_apt_store_enabled)
--  [Function `get_operations_default_to_fa_apt_store_feature`](#0x1_features_get_operations_default_to_fa_apt_store_feature)
--  [Function `operations_default_to_fa_apt_store_enabled`](#0x1_features_operations_default_to_fa_apt_store_enabled)
+-  [Function `get_new_accounts_default_to_fa_cedra_store_feature`](#0x1_features_get_new_accounts_default_to_fa_cedra_store_feature)
+-  [Function `new_accounts_default_to_fa_cedra_store_enabled`](#0x1_features_new_accounts_default_to_fa_cedra_store_enabled)
+-  [Function `get_operations_default_to_fa_cedra_store_feature`](#0x1_features_get_operations_default_to_fa_cedra_store_feature)
+-  [Function `operations_default_to_fa_cedra_store_enabled`](#0x1_features_operations_default_to_fa_cedra_store_enabled)
 -  [Function `get_concurrent_fungible_balance_feature`](#0x1_features_get_concurrent_fungible_balance_feature)
 -  [Function `concurrent_fungible_balance_enabled`](#0x1_features_concurrent_fungible_balance_enabled)
 -  [Function `get_default_to_concurrent_fungible_balance_feature`](#0x1_features_get_default_to_concurrent_fungible_balance_feature)
@@ -280,25 +280,25 @@ Lifetime: transient
 
 
 
-<a id="0x1_features_APTOS_STD_CHAIN_ID_NATIVES"></a>
+<a id="0x1_features_CEDRA_STD_CHAIN_ID_NATIVES"></a>
 
-Whether the new <code>aptos_stdlib::type_info::chain_id()</code> native for fetching the chain ID is enabled.
+Whether the new <code>cedra_stdlib::type_info::chain_id()</code> native for fetching the chain ID is enabled.
 This is needed because of the introduction of a new native function.
 Lifetime: transient
 
 
-<pre><code><b>const</b> <a href="features.md#0x1_features_APTOS_STD_CHAIN_ID_NATIVES">APTOS_STD_CHAIN_ID_NATIVES</a>: u64 = 4;
+<pre><code><b>const</b> <a href="features.md#0x1_features_CEDRA_STD_CHAIN_ID_NATIVES">CEDRA_STD_CHAIN_ID_NATIVES</a>: u64 = 4;
 </code></pre>
 
 
 
-<a id="0x1_features_APTOS_UNIQUE_IDENTIFIERS"></a>
+<a id="0x1_features_CEDRA_UNIQUE_IDENTIFIERS"></a>
 
 Whether enable MOVE functions to call create_auid method to create AUIDs.
 Lifetime: transient
 
 
-<pre><code><b>const</b> <a href="features.md#0x1_features_APTOS_UNIQUE_IDENTIFIERS">APTOS_UNIQUE_IDENTIFIERS</a>: u64 = 23;
+<pre><code><b>const</b> <a href="features.md#0x1_features_CEDRA_UNIQUE_IDENTIFIERS">CEDRA_UNIQUE_IDENTIFIERS</a>: u64 = 23;
 </code></pre>
 
 
@@ -626,7 +626,7 @@ Lifetime: transient
 
 <a id="0x1_features_JWK_CONSENSUS"></a>
 
-Deprecated by <code>aptos_framework::jwk_consensus_config::JWKConsensusConfig</code>.
+Deprecated by <code>cedra_framework::jwk_consensus_config::JWKConsensusConfig</code>.
 
 
 <pre><code><b>const</b> <a href="features.md#0x1_features_JWK_CONSENSUS">JWK_CONSENSUS</a>: u64 = 49;
@@ -719,7 +719,7 @@ Lifetime: transient
 
 <a id="0x1_features_MODULE_EVENT_MIGRATION"></a>
 
-Whether aptos_framwork enables the behavior of module event migration.
+Whether cedra_framwork enables the behavior of module event migration.
 
 Lifetime: transient
 
@@ -753,7 +753,7 @@ Lifetime: transient
 
 <a id="0x1_features_MULTI_ED25519_PK_VALIDATE_V2_NATIVES"></a>
 
-Whether the new <code>aptos_stdlib::multi_ed25519::public_key_validate_internal_v2()</code> native is enabled.
+Whether the new <code>cedra_stdlib::multi_ed25519::public_key_validate_internal_v2()</code> native is enabled.
 This is needed because of the introduction of a new native function.
 Lifetime: transient
 
@@ -772,12 +772,12 @@ Lifetime: transient
 
 
 
-<a id="0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE"></a>
+<a id="0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE"></a>
 
 Lifetime: transient
 
 
-<pre><code><b>const</b> <a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE</a>: u64 = 64;
+<pre><code><b>const</b> <a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE</a>: u64 = 64;
 </code></pre>
 
 
@@ -813,12 +813,12 @@ Whether we use more efficient native implementation of computing object derived 
 
 
 
-<a id="0x1_features_OPERATIONS_DEFAULT_TO_FA_APT_STORE"></a>
+<a id="0x1_features_OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE"></a>
 
 Lifetime: transient
 
 
-<pre><code><b>const</b> <a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_APT_STORE">OPERATIONS_DEFAULT_TO_FA_APT_STORE</a>: u64 = 65;
+<pre><code><b>const</b> <a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE">OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE</a>: u64 = 65;
 </code></pre>
 
 
@@ -847,7 +847,7 @@ Lifetime: transient
 
 <a id="0x1_features_PARTIAL_GOVERNANCE_VOTING"></a>
 
-Whether enable paritial governance voting on aptos_governance.
+Whether enable paritial governance voting on cedra_governance.
 Lifetime: transient
 
 
@@ -876,18 +876,18 @@ Lifetime: transient
 
 
 
-<a id="0x1_features_PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS"></a>
+<a id="0x1_features_PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS"></a>
 
 
 
-<pre><code><b>const</b> <a href="features.md#0x1_features_PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS">PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS</a>: u64 = 61;
+<pre><code><b>const</b> <a href="features.md#0x1_features_PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS">PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS</a>: u64 = 61;
 </code></pre>
 
 
 
 <a id="0x1_features_RECONFIGURE_WITH_DKG"></a>
 
-Deprecated by <code>aptos_framework::randomness_config::RandomnessConfig</code>.
+Deprecated by <code>cedra_framework::randomness_config::RandomnessConfig</code>.
 
 
 <pre><code><b>const</b> <a href="features.md#0x1_features_RECONFIGURE_WITH_DKG">RECONFIGURE_WITH_DKG</a>: u64 = 45;
@@ -1165,13 +1165,13 @@ We do not expect use from Move, so for now only for documentation purposes here
 
 </details>
 
-<a id="0x1_features_get_aptos_stdlib_chain_id_feature"></a>
+<a id="0x1_features_get_cedra_stdlib_chain_id_feature"></a>
 
-## Function `get_aptos_stdlib_chain_id_feature`
+## Function `get_cedra_stdlib_chain_id_feature`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_aptos_stdlib_chain_id_feature">get_aptos_stdlib_chain_id_feature</a>(): u64
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_cedra_stdlib_chain_id_feature">get_cedra_stdlib_chain_id_feature</a>(): u64
 </code></pre>
 
 
@@ -1180,20 +1180,20 @@ We do not expect use from Move, so for now only for documentation purposes here
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_aptos_stdlib_chain_id_feature">get_aptos_stdlib_chain_id_feature</a>(): u64 { <a href="features.md#0x1_features_APTOS_STD_CHAIN_ID_NATIVES">APTOS_STD_CHAIN_ID_NATIVES</a> }
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_cedra_stdlib_chain_id_feature">get_cedra_stdlib_chain_id_feature</a>(): u64 { <a href="features.md#0x1_features_CEDRA_STD_CHAIN_ID_NATIVES">CEDRA_STD_CHAIN_ID_NATIVES</a> }
 </code></pre>
 
 
 
 </details>
 
-<a id="0x1_features_aptos_stdlib_chain_id_enabled"></a>
+<a id="0x1_features_cedra_stdlib_chain_id_enabled"></a>
 
-## Function `aptos_stdlib_chain_id_enabled`
+## Function `cedra_stdlib_chain_id_enabled`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_aptos_stdlib_chain_id_enabled">aptos_stdlib_chain_id_enabled</a>(): bool
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_cedra_stdlib_chain_id_enabled">cedra_stdlib_chain_id_enabled</a>(): bool
 </code></pre>
 
 
@@ -1202,8 +1202,8 @@ We do not expect use from Move, so for now only for documentation purposes here
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_aptos_stdlib_chain_id_enabled">aptos_stdlib_chain_id_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
-    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_APTOS_STD_CHAIN_ID_NATIVES">APTOS_STD_CHAIN_ID_NATIVES</a>)
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_cedra_stdlib_chain_id_enabled">cedra_stdlib_chain_id_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
+    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_CEDRA_STD_CHAIN_ID_NATIVES">CEDRA_STD_CHAIN_ID_NATIVES</a>)
 }
 </code></pre>
 
@@ -2932,14 +2932,14 @@ Deprecated feature
 
 </details>
 
-<a id="0x1_features_get_primary_apt_fungible_store_at_user_address_feature"></a>
+<a id="0x1_features_get_primary_cedra_fungible_store_at_user_address_feature"></a>
 
-## Function `get_primary_apt_fungible_store_at_user_address_feature`
+## Function `get_primary_cedra_fungible_store_at_user_address_feature`
 
 
 
 <pre><code>#[deprecated]
-<b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_primary_apt_fungible_store_at_user_address_feature">get_primary_apt_fungible_store_at_user_address_feature</a>(): u64
+<b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_primary_cedra_fungible_store_at_user_address_feature">get_primary_cedra_fungible_store_at_user_address_feature</a>(): u64
 </code></pre>
 
 
@@ -2948,7 +2948,7 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_primary_apt_fungible_store_at_user_address_feature">get_primary_apt_fungible_store_at_user_address_feature</a>(
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_primary_cedra_fungible_store_at_user_address_feature">get_primary_cedra_fungible_store_at_user_address_feature</a>(
 ): u64 {
     <b>abort</b> <a href="error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="features.md#0x1_features_EINVALID_FEATURE">EINVALID_FEATURE</a>)
 }
@@ -2958,14 +2958,14 @@ Deprecated feature
 
 </details>
 
-<a id="0x1_features_primary_apt_fungible_store_at_user_address_enabled"></a>
+<a id="0x1_features_primary_cedra_fungible_store_at_user_address_enabled"></a>
 
-## Function `primary_apt_fungible_store_at_user_address_enabled`
+## Function `primary_cedra_fungible_store_at_user_address_enabled`
 
 
 
 <pre><code>#[deprecated]
-<b>public</b> <b>fun</b> <a href="features.md#0x1_features_primary_apt_fungible_store_at_user_address_enabled">primary_apt_fungible_store_at_user_address_enabled</a>(): bool
+<b>public</b> <b>fun</b> <a href="features.md#0x1_features_primary_cedra_fungible_store_at_user_address_enabled">primary_cedra_fungible_store_at_user_address_enabled</a>(): bool
 </code></pre>
 
 
@@ -2974,8 +2974,8 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_primary_apt_fungible_store_at_user_address_enabled">primary_apt_fungible_store_at_user_address_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
-    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS">PRIMARY_APT_FUNGIBLE_STORE_AT_USER_ADDRESS</a>)
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_primary_cedra_fungible_store_at_user_address_enabled">primary_cedra_fungible_store_at_user_address_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
+    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS">PRIMARY_CEDRA_FUNGIBLE_STORE_AT_USER_ADDRESS</a>)
 }
 </code></pre>
 
@@ -3099,13 +3099,13 @@ Deprecated feature
 
 </details>
 
-<a id="0x1_features_get_new_accounts_default_to_fa_apt_store_feature"></a>
+<a id="0x1_features_get_new_accounts_default_to_fa_cedra_store_feature"></a>
 
-## Function `get_new_accounts_default_to_fa_apt_store_feature`
+## Function `get_new_accounts_default_to_fa_cedra_store_feature`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_new_accounts_default_to_fa_apt_store_feature">get_new_accounts_default_to_fa_apt_store_feature</a>(): u64
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_new_accounts_default_to_fa_cedra_store_feature">get_new_accounts_default_to_fa_cedra_store_feature</a>(): u64
 </code></pre>
 
 
@@ -3114,20 +3114,20 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_new_accounts_default_to_fa_apt_store_feature">get_new_accounts_default_to_fa_apt_store_feature</a>(): u64 { <a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE</a> }
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_new_accounts_default_to_fa_cedra_store_feature">get_new_accounts_default_to_fa_cedra_store_feature</a>(): u64 { <a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE</a> }
 </code></pre>
 
 
 
 </details>
 
-<a id="0x1_features_new_accounts_default_to_fa_apt_store_enabled"></a>
+<a id="0x1_features_new_accounts_default_to_fa_cedra_store_enabled"></a>
 
-## Function `new_accounts_default_to_fa_apt_store_enabled`
+## Function `new_accounts_default_to_fa_cedra_store_enabled`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_new_accounts_default_to_fa_apt_store_enabled">new_accounts_default_to_fa_apt_store_enabled</a>(): bool
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_new_accounts_default_to_fa_cedra_store_enabled">new_accounts_default_to_fa_cedra_store_enabled</a>(): bool
 </code></pre>
 
 
@@ -3136,8 +3136,8 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_new_accounts_default_to_fa_apt_store_enabled">new_accounts_default_to_fa_apt_store_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
-    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE</a>)
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_new_accounts_default_to_fa_cedra_store_enabled">new_accounts_default_to_fa_cedra_store_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
+    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE</a>)
 }
 </code></pre>
 
@@ -3145,13 +3145,13 @@ Deprecated feature
 
 </details>
 
-<a id="0x1_features_get_operations_default_to_fa_apt_store_feature"></a>
+<a id="0x1_features_get_operations_default_to_fa_cedra_store_feature"></a>
 
-## Function `get_operations_default_to_fa_apt_store_feature`
+## Function `get_operations_default_to_fa_cedra_store_feature`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_operations_default_to_fa_apt_store_feature">get_operations_default_to_fa_apt_store_feature</a>(): u64
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_operations_default_to_fa_cedra_store_feature">get_operations_default_to_fa_cedra_store_feature</a>(): u64
 </code></pre>
 
 
@@ -3160,20 +3160,20 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_operations_default_to_fa_apt_store_feature">get_operations_default_to_fa_apt_store_feature</a>(): u64 { <a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_APT_STORE">OPERATIONS_DEFAULT_TO_FA_APT_STORE</a> }
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_get_operations_default_to_fa_cedra_store_feature">get_operations_default_to_fa_cedra_store_feature</a>(): u64 { <a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE">OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE</a> }
 </code></pre>
 
 
 
 </details>
 
-<a id="0x1_features_operations_default_to_fa_apt_store_enabled"></a>
+<a id="0x1_features_operations_default_to_fa_cedra_store_enabled"></a>
 
-## Function `operations_default_to_fa_apt_store_enabled`
+## Function `operations_default_to_fa_cedra_store_enabled`
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_operations_default_to_fa_apt_store_enabled">operations_default_to_fa_apt_store_enabled</a>(): bool
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_operations_default_to_fa_cedra_store_enabled">operations_default_to_fa_cedra_store_enabled</a>(): bool
 </code></pre>
 
 
@@ -3182,8 +3182,8 @@ Deprecated feature
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_operations_default_to_fa_apt_store_enabled">operations_default_to_fa_apt_store_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
-    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_APT_STORE">OPERATIONS_DEFAULT_TO_FA_APT_STORE</a>)
+<pre><code><b>public</b> <b>fun</b> <a href="features.md#0x1_features_operations_default_to_fa_cedra_store_enabled">operations_default_to_fa_cedra_store_enabled</a>(): bool <b>acquires</b> <a href="features.md#0x1_features_Features">Features</a> {
+    <a href="features.md#0x1_features_is_enabled">is_enabled</a>(<a href="features.md#0x1_features_OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE">OPERATIONS_DEFAULT_TO_FA_CEDRA_STORE</a>)
 }
 </code></pre>
 
@@ -4260,11 +4260,11 @@ Helper to check whether a feature flag is enabled.
 
 
 
-<a id="0x1_features_spec_new_accounts_default_to_fa_apt_store_enabled"></a>
+<a id="0x1_features_spec_new_accounts_default_to_fa_cedra_store_enabled"></a>
 
 
-<pre><code><b>fun</b> <a href="features.md#0x1_features_spec_new_accounts_default_to_fa_apt_store_enabled">spec_new_accounts_default_to_fa_apt_store_enabled</a>(): bool {
-   <a href="features.md#0x1_features_spec_is_enabled">spec_is_enabled</a>(<a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_APT_STORE</a>)
+<pre><code><b>fun</b> <a href="features.md#0x1_features_spec_new_accounts_default_to_fa_cedra_store_enabled">spec_new_accounts_default_to_fa_cedra_store_enabled</a>(): bool {
+   <a href="features.md#0x1_features_spec_is_enabled">spec_is_enabled</a>(<a href="features.md#0x1_features_NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE">NEW_ACCOUNTS_DEFAULT_TO_FA_CEDRA_STORE</a>)
 }
 </code></pre>
 
@@ -4527,4 +4527,4 @@ Helper to check whether a feature flag is enabled.
 </code></pre>
 
 
-[move-book]: https://aptos.dev/move/book/SUMMARY
+[move-book]: https://cedra.dev/move/book/SUMMARY
