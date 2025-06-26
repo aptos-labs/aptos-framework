@@ -491,7 +491,7 @@ Claim the delegated mint capability and destroy the delegated token.
 <td>The CEDRA coin may only be created exactly once.</td>
 <td>Medium</td>
 <td>The initialization function may only be called once.</td>
-<td>Enforced through the <a href="https://github.com/cedra-labs/cedra-core/blob/main/cedra-move/framework/cedra-framework/sources/coin.move">coin</a> module, which has been audited.</td>
+<td>Enforced through the <a href="https://github.com/cedra-labs/cedra-network/blob/main/cedra-move/framework/cedra-framework/sources/coin.move">coin</a> module, which has been audited.</td>
 </tr>
 
 <tr>
@@ -499,7 +499,7 @@ Claim the delegated mint capability and destroy the delegated token.
 <td>Any type of operation on the CEDRA coin should fail if the user has not registered for the coin.</td>
 <td>Medium</td>
 <td>Coin operations may succeed only on valid user coin registration.</td>
-<td>Enforced through the <a href="https://github.com/cedra-labs/cedra-core/blob/main/cedra-move/framework/cedra-framework/sources/coin.move">coin</a> module, which has been audited.</td>
+<td>Enforced through the <a href="https://github.com/cedra-labs/cedra-network/blob/main/cedra-move/framework/cedra-framework/sources/coin.move">coin</a> module, which has been audited.</td>
 </tr>
 
 </table>

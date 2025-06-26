@@ -36,7 +36,7 @@ spec cedra_framework::staking_proxy {
     /// Criticality: Medium
     /// Implementation: Duplicates among operators could result in incorrectly updating the operator or voter
     /// associated with the incorrect StakingContract.
-    /// Enforcement: Enforced via [https://github.com/cedra-labs/cedra-core/blob/main/cedra-move/framework/cedra-framework/sources/staking_contract.move#L87](SimpleMap).
+    /// Enforcement: Enforced via [https://github.com/cedra-labs/cedra-network/blob/main/cedra-move/framework/cedra-framework/sources/staking_contract.move#L87](SimpleMap).
     /// </high-level-req>
     ///
     spec module {

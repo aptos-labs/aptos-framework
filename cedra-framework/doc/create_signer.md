@@ -77,7 +77,7 @@ on account to have access to this.
 <td>The account owner should have the ability to create a signer for their account.</td>
 <td>Medium</td>
 <td>Before an Account resource is created, a signer is created for the specified new_address, and later, the Account resource is assigned to this signer.</td>
-<td>Enforced by the <a href="https://github.com/cedra-labs/cedra-core/blob/main/third_party/move/move-vm/types/src/values/values_impl.rs#L1129">move vm</a>.</td>
+<td>Enforced by the <a href="https://github.com/cedra-labs/cedra-network/blob/main/third_party/move/move-vm/types/src/values/values_impl.rs#L1129">move vm</a>.</td>
 </tr>
 
 <tr>

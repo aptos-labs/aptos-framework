@@ -14,7 +14,7 @@ spec cedra_framework::create_signer {
     /// Criticality: Medium
     /// Implementation: Before an Account resource is created, a signer is created for the specified new_address, and
     /// later, the Account resource is assigned to this signer.
-    /// Enforcement: Enforced by the [https://github.com/cedra-labs/cedra-core/blob/main/third_party/move/move-vm/types/src/values/values_impl.rs#L1129](move vm).
+    /// Enforcement: Enforced by the [https://github.com/cedra-labs/cedra-network/blob/main/third_party/move/move-vm/types/src/values/values_impl.rs#L1129](move vm).
     ///
     /// No.: 3
     /// Requirement: An account should only be able to create a signer for another account if that account has granted it

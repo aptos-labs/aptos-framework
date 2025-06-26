@@ -92,7 +92,7 @@ module cedra_framework::stake {
     const VALIDATOR_STATUS_INACTIVE: u64 = 4;
 
     /// Limit the maximum size to u16::max, it's the current limit of the bitvec
-    /// https://github.com/cedra-labs/cedra-core/blob/main/crates/cedra-bitvec/src/lib.rs#L20
+    /// https://github.com/cedra-labs/cedra-network/blob/main/crates/cedra-bitvec/src/lib.rs#L20
     const MAX_VALIDATOR_SET_SIZE: u64 = 65536;
 
     /// Limit the maximum value of `rewards_rate` in order to avoid any arithmetic overflow.

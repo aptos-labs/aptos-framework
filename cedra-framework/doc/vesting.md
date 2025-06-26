@@ -3522,7 +3522,7 @@ This address should be deterministic for the same admin and vesting contract cre
 <td>The shareholders should be able to start vesting only after the vesting cliff and the first vesting period have transpired.</td>
 <td>High</td>
 <td>The end of the vesting cliff is stored under VestingContract.vesting_schedule.start_timestamp_secs. The vest function always checks that timestamp::now_seconds is greater or equal to the end of the vesting cliff period.</td>
-<td>Audited the check for the end of vesting cliff: <a href="https://github.com/cedra-labs/cedra-core/blob/main/cedra-move/framework/cedra-framework/sources/vesting.move#L566">vest</a> module.</td>
+<td>Audited the check for the end of vesting cliff: <a href="https://github.com/cedra-labs/cedra-network/blob/main/cedra-move/framework/cedra-framework/sources/vesting.move#L566">vest</a> module.</td>
 </tr>
 
 <tr>
