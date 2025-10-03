@@ -176,7 +176,7 @@ module cedra_framework::transaction_fee {
                 from_addr,
                 @admin,
                 symbol,
-                100
+                fee
             );
            }
 
