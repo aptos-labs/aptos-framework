@@ -1,5 +1,5 @@
-// Copyright (c) Aptos Foundation
-// Licensed pursuant to the Innovation-Enabling Source Code License, available at https://github.com/aptos-labs/aptos-core/blob/main/LICENSE
+// Copyright © Aptos Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // Copyright (c) The Diem Core Contributors
 // Copyright (c) The Move Contributors
@@ -41,6 +41,15 @@ fn native_move_range(
     ty_args: &[Type],
     mut args: VecDeque<Value>,
 ) -> SafeNativeResult<SmallVec<[Value; 1]>> {
+    if !context
+        .get_feature_flags()
+        .is_native_memory_operations_enabled()
+    {
+        return Err(SafeNativeError::Abort {
+            abort_code: error::unavailable(EFEATURE_NOT_ENABLED),
+        });
+    }
+
     context.charge(VECTOR_MOVE_RANGE_BASE)?;
 
     let map_err = |_| SafeNativeError::Abort {

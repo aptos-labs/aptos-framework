@@ -26,7 +26,8 @@ module aptos_framework::event {
 
     #[test_only]
     public fun was_event_emitted<T: drop + store>(msg: &T): bool {
-        emitted_events<T>().contains(msg)
+        use std::vector;
+        vector::contains(&emitted_events<T>(), msg)
     }
 
     #[deprecated]
@@ -56,7 +57,7 @@ module aptos_framework::event {
         spec {
             assume handle_ref.counter + 1 <= MAX_U64;
         };
-        handle_ref.counter += 1;
+        handle_ref.counter = handle_ref.counter + 1;
     }
 
     #[deprecated]
@@ -88,6 +89,7 @@ module aptos_framework::event {
     #[deprecated]
     #[test_only]
     public fun was_event_emitted_by_handle<T: drop + store>(handle: &EventHandle<T>, msg: &T): bool {
-        emitted_events_by_handle(handle).contains(msg)
+        use std::vector;
+        vector::contains(&emitted_events_by_handle(handle), msg)
     }
 }

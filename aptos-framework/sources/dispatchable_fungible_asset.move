@@ -20,12 +20,15 @@ module aptos_framework::dispatchable_fungible_asset {
     use aptos_framework::object::{Self, ConstructorRef, Object};
 
     use std::error;
-    use std::option::Option;
+    use std::features;
+    use std::option::{Self, Option};
 
     /// TransferRefStore doesn't exist on the fungible asset type.
     const ESTORE_NOT_FOUND: u64 = 1;
     /// Recipient is not getting the guaranteed value;
     const EAMOUNT_MISMATCH: u64 = 2;
+    /// Feature is not activated yet on the network.
+    const ENOT_ACTIVATED: u64 = 3;
     /// Dispatch target is not loaded.
     const ENOT_LOADED: u64 = 4;
 
@@ -46,7 +49,7 @@ module aptos_framework::dispatchable_fungible_asset {
             deposit_function,
             derived_balance_function,
         );
-        let store_obj = &constructor_ref.generate_signer();
+        let store_obj = &object::generate_signer(constructor_ref);
         move_to<TransferRefStore>(
             store_obj,
             TransferRefStore {
@@ -76,8 +79,12 @@ module aptos_framework::dispatchable_fungible_asset {
         fungible_asset::withdraw_sanity_check(owner, store, false);
         fungible_asset::withdraw_permission_check(owner, store, amount);
         let func_opt = fungible_asset::withdraw_dispatch_function(store);
-        if (func_opt.is_some()) {
-            let func = func_opt.borrow();
+        if (option::is_some(&func_opt)) {
+            assert!(
+                features::dispatchable_fungible_asset_enabled(),
+                error::aborted(ENOT_ACTIVATED)
+            );
+            let func = option::borrow(&func_opt);
             function_info::load_module_from_function(func);
             let fa = dispatchable_withdraw(
                 store,
@@ -87,7 +94,7 @@ module aptos_framework::dispatchable_fungible_asset {
             );
             fa
         } else {
-            fungible_asset::unchecked_withdraw(store.object_address(), amount)
+            fungible_asset::unchecked_withdraw(object::object_address(&store), amount)
         }
     }
 
@@ -97,8 +104,12 @@ module aptos_framework::dispatchable_fungible_asset {
     public fun deposit<T: key>(store: Object<T>, fa: FungibleAsset) acquires TransferRefStore {
         fungible_asset::deposit_sanity_check(store, false);
         let func_opt = fungible_asset::deposit_dispatch_function(store);
-        if (func_opt.is_some()) {
-            let func = func_opt.borrow();
+        if (option::is_some(&func_opt)) {
+            assert!(
+                features::dispatchable_fungible_asset_enabled(),
+                error::aborted(ENOT_ACTIVATED)
+            );
+            let func = option::borrow(&func_opt);
             function_info::load_module_from_function(func);
             dispatchable_deposit(
                 store,
@@ -107,7 +118,7 @@ module aptos_framework::dispatchable_fungible_asset {
                 func
             )
         } else {
-            fungible_asset::unchecked_deposit(store.object_address(), fa)
+            fungible_asset::unchecked_deposit(object::object_address(&store), fa)
         }
     }
 
@@ -146,8 +157,12 @@ module aptos_framework::dispatchable_fungible_asset {
     /// The semantics of value will be governed by the function specified in DispatchFunctionStore.
     public fun derived_balance<T: key>(store: Object<T>): u64 {
         let func_opt = fungible_asset::derived_balance_dispatch_function(store);
-        if (func_opt.is_some()) {
-            let func = func_opt.borrow();
+        if (option::is_some(&func_opt)) {
+            assert!(
+                features::dispatchable_fungible_asset_enabled(),
+                error::aborted(ENOT_ACTIVATED)
+            );
+            let func = option::borrow(&func_opt);
             function_info::load_module_from_function(func);
             dispatchable_derived_balance(store, func)
         } else {
@@ -161,8 +176,12 @@ module aptos_framework::dispatchable_fungible_asset {
     /// The semantics of value will be governed by the function specified in DispatchFunctionStore.
     public fun is_derived_balance_at_least<T: key>(store: Object<T>, amount: u64): bool {
         let func_opt = fungible_asset::derived_balance_dispatch_function(store);
-        if (func_opt.is_some()) {
-            let func = func_opt.borrow();
+        if (option::is_some(&func_opt)) {
+            assert!(
+                features::dispatchable_fungible_asset_enabled(),
+                error::aborted(ENOT_ACTIVATED)
+            );
+            let func = option::borrow(&func_opt);
             function_info::load_module_from_function(func);
             dispatchable_derived_balance(store, func) >= amount
         } else {
@@ -176,8 +195,12 @@ module aptos_framework::dispatchable_fungible_asset {
     /// The semantics of supply will be governed by the function specified in DeriveSupplyDispatch.
     public fun derived_supply<T: key>(metadata: Object<T>): Option<u128> {
         let func_opt = fungible_asset::derived_supply_dispatch_function(metadata);
-        if (func_opt.is_some()) {
-            let func = func_opt.borrow();
+        if (option::is_some(&func_opt)) {
+            assert!(
+                features::dispatchable_fungible_asset_enabled(),
+                error::aborted(ENOT_ACTIVATED)
+            );
+            let func = option::borrow(&func_opt);
             function_info::load_module_from_function(func);
             dispatchable_derived_supply(metadata, func)
         } else {
@@ -186,7 +209,9 @@ module aptos_framework::dispatchable_fungible_asset {
     }
 
     inline fun borrow_transfer_ref<T: key>(metadata: Object<T>): &TransferRef {
-        let metadata_addr = fungible_asset::store_metadata(metadata).object_address();
+        let metadata_addr = object::object_address(
+            &fungible_asset::store_metadata(metadata)
+        );
         assert!(
             exists<TransferRefStore>(metadata_addr),
             error::not_found(ESTORE_NOT_FOUND)
