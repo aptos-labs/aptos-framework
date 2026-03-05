@@ -22,9 +22,7 @@ sizes are limited to $\{1, 2, 4, 8, 16\}$.
 -  [Function `verify_range_proof_pedersen`](#0x1_ristretto255_bulletproofs_verify_range_proof_pedersen)
 -  [Function `verify_range_proof`](#0x1_ristretto255_bulletproofs_verify_range_proof)
 -  [Function `verify_batch_range_proof_pedersen`](#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen)
--  [Function `verify_batch_range_proof_pedersen_helper`](#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen_helper)
 -  [Function `verify_batch_range_proof`](#0x1_ristretto255_bulletproofs_verify_batch_range_proof)
--  [Function `verify_batch_range_proof_helper`](#0x1_ristretto255_bulletproofs_verify_batch_range_proof_helper)
 -  [Function `verify_range_proof_internal`](#0x1_ristretto255_bulletproofs_verify_range_proof_internal)
 -  [Function `verify_batch_range_proof_internal`](#0x1_ristretto255_bulletproofs_verify_batch_range_proof_internal)
 -  [Specification](#@Specification_1)
@@ -323,7 +321,7 @@ Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch s
 NOTE: currently, domain separation tags of size larger than 256 bytes are not supported.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen">verify_batch_range_proof_pedersen</a>(_comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255_pedersen.md#0x1_ristretto255_pedersen_Commitment">ristretto255_pedersen::Commitment</a>&gt;, _proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, _num_bits: u64, _dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
+<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen">verify_batch_range_proof_pedersen</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255_pedersen.md#0x1_ristretto255_pedersen_Commitment">ristretto255_pedersen::Commitment</a>&gt;, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 </code></pre>
 
 
@@ -333,37 +331,10 @@ NOTE: currently, domain separation tags of size larger than 256 bytes are not su
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen">verify_batch_range_proof_pedersen</a>(
-    _comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;pedersen::Commitment&gt;, _proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>,
-    _num_bits: u64, _dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
-{
-    <b>abort</b> <a href="../../move-stdlib/doc/error.md#0x1_error_unavailable">error::unavailable</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_NATIVE_FUN_NOT_AVAILABLE">E_NATIVE_FUN_NOT_AVAILABLE</a>)
-}
-</code></pre>
-
-
-
-</details>
-
-<a id="0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen_helper"></a>
-
-## Function `verify_batch_range_proof_pedersen_helper`
-
-
-
-<pre><code><b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen_helper">verify_batch_range_proof_pedersen_helper</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255_pedersen.md#0x1_ristretto255_pedersen_Commitment">ristretto255_pedersen::Commitment</a>&gt;, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
-</code></pre>
-
-
-
-<details>
-<summary>Implementation</summary>
-
-
-<pre><code><b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_pedersen_helper">verify_batch_range_proof_pedersen_helper</a>(
     comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;pedersen::Commitment&gt;, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>,
     num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 {
-    <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_helper">verify_batch_range_proof_helper</a>(
+    <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(
         &comms.map_ref(|com| <a href="ristretto255.md#0x1_ristretto255_point_clone">ristretto255::point_clone</a>(pedersen::commitment_as_point(com))),
         &<a href="ristretto255.md#0x1_ristretto255_basepoint">ristretto255::basepoint</a>(), &<a href="ristretto255.md#0x1_ristretto255_hash_to_point_base">ristretto255::hash_to_point_base</a>(),
         proof,
@@ -381,7 +352,6 @@ NOTE: currently, domain separation tags of size larger than 256 bytes are not su
 
 ## Function `verify_batch_range_proof`
 
-Verifies a zero-knowledge range proof for a batch of commitments <code>comms</code> (each of the form
 <code>v * val_base + r * rand_base</code>), ensuring that all values <code>v</code> satisfy
 <code>v</code> in <code>[0, 2^num_bits)</code>. Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch size
 (length of the <code>comms</code>) in <code>{1, 2, 4, 8, 16}</code>.
@@ -389,7 +359,7 @@ Verifies a zero-knowledge range proof for a batch of commitments <code>comms</co
 NOTE: currently, domain separation tags of size larger than 256 bytes are not supported.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(_comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>&gt;, _val_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, _rand_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, _proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, _num_bits: u64, _dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
+<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>&gt;, val_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, rand_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 </code></pre>
 
 
@@ -399,34 +369,6 @@ NOTE: currently, domain separation tags of size larger than 256 bytes are not su
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(
-    _comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;RistrettoPoint&gt;,
-    _val_base: &RistrettoPoint, _rand_base: &RistrettoPoint,
-    _proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>, _num_bits: u64, _dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
-{
-    <b>abort</b> <a href="../../move-stdlib/doc/error.md#0x1_error_unavailable">error::unavailable</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_NATIVE_FUN_NOT_AVAILABLE">E_NATIVE_FUN_NOT_AVAILABLE</a>)
-}
-</code></pre>
-
-
-
-</details>
-
-<a id="0x1_ristretto255_bulletproofs_verify_batch_range_proof_helper"></a>
-
-## Function `verify_batch_range_proof_helper`
-
-
-
-<pre><code><b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_helper">verify_batch_range_proof_helper</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>&gt;, val_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, rand_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
-</code></pre>
-
-
-
-<details>
-<summary>Implementation</summary>
-
-
-<pre><code><b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_helper">verify_batch_range_proof_helper</a>(
     comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;RistrettoPoint&gt;,
     val_base: &RistrettoPoint, rand_base: &RistrettoPoint,
     proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool

@@ -1,11 +1,11 @@
 #[test_only]
-module aptos_framework::reentrant_token_tests {
+module 0xcafe::reentrant_token_tests {
     use aptos_framework::fungible_asset::{Self, Metadata, TestToken};
     use aptos_framework::dispatchable_fungible_asset;
-    use aptos_framework::reentrant_token;
+    use 0xcafe::reentrant_token;
     use std::option;
 
-    #[test(creator = @aptos_framework)]
+    #[test(creator = @0xcafe)]
     #[expected_failure(major_status=4037, location=aptos_framework::dispatchable_fungible_asset)]
     fun test_reentrant_deposit(
         creator: &signer,

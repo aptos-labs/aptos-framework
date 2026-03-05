@@ -95,7 +95,6 @@ spec aptos_std::ristretto255 {
 
     spec scalar_from_u128_internal {
         pragma opaque;
-        pragma bv=b"0";
         aborts_if [abstract] false;
         ensures result == spec_scalar_from_u128_internal(num);
     }
@@ -164,7 +163,6 @@ spec aptos_std::ristretto255 {
     }
 
     spec new_scalar_from_u128 {
-        pragma bv=b"0";
         aborts_if false;
         ensures result.data == spec_scalar_from_u128_internal(sixteen_bytes);
     }
@@ -184,7 +182,7 @@ spec aptos_std::ristretto255 {
     }
 
     spec scalar_is_zero {
-        ensures result == spec_scalar_is_zero(self);
+        ensures result == spec_scalar_is_zero(s);
     }
 
     spec scalar_one {
@@ -192,18 +190,18 @@ spec aptos_std::ristretto255 {
     }
 
     spec scalar_is_one {
-        ensures result == spec_scalar_is_one(self);
+        ensures result == spec_scalar_is_one(s);
     }
 
     spec scalar_equals {
         aborts_if false;
-        ensures result == (self.data == rhs.data);
+        ensures result == (lhs.data == rhs.data);
     }
 
     spec scalar_invert {
         aborts_if false;
-        ensures spec_scalar_is_zero(self) ==> std::option::is_none(result);
-        ensures !spec_scalar_is_zero(self) ==> (std::option::is_some(result) && std::option::borrow(result).data == spec_scalar_invert_internal(self.data));
+        ensures spec_scalar_is_zero(s) ==> std::option::is_none(result);
+        ensures !spec_scalar_is_zero(s) ==> (std::option::is_some(result) && std::option::borrow(result).data == spec_scalar_invert_internal(s.data));
     }
 
     spec scalar_mul_internal {
@@ -220,7 +218,7 @@ spec aptos_std::ristretto255 {
 
     spec scalar_sub {
         aborts_if false;
-        ensures result.data == spec_scalar_sub_internal(self.data, b.data);
+        ensures result.data == spec_scalar_sub_internal(a.data, b.data);
     }
 
     spec scalar_sub_internal {
@@ -232,7 +230,7 @@ spec aptos_std::ristretto255 {
     spec scalar_neg {
         pragma opaque;
         aborts_if false;
-        ensures result.data == spec_scalar_neg_internal(self.data);
+        ensures result.data == spec_scalar_neg_internal(a.data);
     }
 
     spec scalar_neg_internal {
@@ -243,37 +241,37 @@ spec aptos_std::ristretto255 {
 
     spec scalar_neg_assign {
         aborts_if false;
-        ensures self.data == spec_scalar_neg_internal(old(self).data);
+        ensures a.data == spec_scalar_neg_internal(old(a).data);
     }
 
     spec scalar_add {
         aborts_if false;
-        ensures result.data == spec_scalar_add_internal(self.data, b.data);
+        ensures result.data == spec_scalar_add_internal(a.data, b.data);
     }
 
     spec scalar_add_assign {
         aborts_if false;
-        ensures self.data == spec_scalar_add_internal(old(self).data, b.data);
+        ensures a.data == spec_scalar_add_internal(old(a).data, b.data);
     }
 
     spec scalar_mul {
         aborts_if false;
-        ensures result.data == spec_scalar_mul_internal(self.data, b.data);
+        ensures result.data == spec_scalar_mul_internal(a.data, b.data);
     }
 
     spec scalar_mul_assign {
         aborts_if false;
-        ensures self.data == spec_scalar_mul_internal(old(self).data, b.data);
+        ensures a.data == spec_scalar_mul_internal(old(a).data, b.data);
     }
 
     spec scalar_sub_assign {
         aborts_if false;
-        ensures self.data == spec_scalar_sub_internal(old(self).data, b.data);
+        ensures a.data == spec_scalar_sub_internal(old(a).data, b.data);
     }
 
     spec scalar_to_bytes {
         aborts_if false;
-        ensures result == self.data;
+        ensures result == s.data;
     }
 
     /// # Helper functions
