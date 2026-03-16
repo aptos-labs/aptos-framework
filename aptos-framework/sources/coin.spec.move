@@ -448,7 +448,6 @@ spec aptos_framework::coin {
         monitor_supply: bool,
         parallelizable: bool
     ): (BurnCapability<CoinType>, FreezeCapability<CoinType>, MintCapability<CoinType>) {
-        use aptos_framework::aggregator_factory;
         include InitializeInternalSchema<CoinType> {
             name: name.bytes,
             symbol: symbol.bytes
