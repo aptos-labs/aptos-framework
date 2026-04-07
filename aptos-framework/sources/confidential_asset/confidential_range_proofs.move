@@ -4,7 +4,7 @@
 module aptos_framework::confidential_range_proofs {
     use std::error;
     use std::features;
-    use aptos_std::ristretto255::{Self, RistrettoPoint, CompressedRistretto};
+    use aptos_std::ristretto255::{Self, RistrettoPoint};
     use aptos_std::ristretto255_bulletproofs::{Self as bulletproofs, RangeProof};
     use aptos_framework::confidential_balance;
 
@@ -34,12 +34,14 @@ module aptos_framework::confidential_range_proofs {
 
     /// Asserts that the given commitment chunks are each in [0, 2^16) via a range proof.
     public(friend) fun assert_valid_range_proof(
-        commitments: &vector<CompressedRistretto>,
+        commitments: &vector<RistrettoPoint>,
         zkrp: &RangeProof
     ) {
+        let commitments = commitments.map_ref(|c| c.point_clone());
+
         assert!(
             verify_batch_range_proof(
-                commitments,
+                &commitments,
                 &ristretto255::basepoint(),
                 &ristretto255::hash_to_point_base(),
                 zkrp,
@@ -52,14 +54,14 @@ module aptos_framework::confidential_range_proofs {
 
     /// Verifies a batch range proof for commitments, ensuring all committed values are in [0, 2^num_bits).
     fun verify_batch_range_proof(
-        comms: &vector<CompressedRistretto>,
+        comms: &vector<RistrettoPoint>,
         val_base: &RistrettoPoint, rand_base: &RistrettoPoint,
         proof: &RangeProof, num_bits: u64, dst: vector<u8>): bool
     {
         assert!(features::bulletproofs_batch_enabled(), error::invalid_state(E_NATIVE_FUN_NOT_AVAILABLE));
         assert!(dst.length() <= 256, error::invalid_argument(E_DST_TOO_LONG));
 
-        let comms = comms.map_ref(|com| com.point_to_bytes());
+        let comms = comms.map_ref(|com| ristretto255::point_to_bytes(&ristretto255::point_compress(com)));
 
         verify_batch_range_proof_internal(
             comms,

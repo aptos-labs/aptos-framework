@@ -63,7 +63,6 @@ have a simple layout which is easily accessible in Rust.
     -  [Function `update_federated_jwk_set`](#@Specification_1_update_federated_jwk_set)
     -  [Function `get_patched_jwk`](#@Specification_1_get_patched_jwk)
     -  [Function `try_get_patched_jwk`](#@Specification_1_try_get_patched_jwk)
-    -  [Function `remove_oidc_provider_for_next_epoch`](#@Specification_1_remove_oidc_provider_for_next_epoch)
     -  [Function `on_new_epoch`](#@Specification_1_on_new_epoch)
     -  [Function `set_patches`](#@Specification_1_set_patches)
     -  [Function `upsert_into_observed_jwks`](#@Specification_1_upsert_into_observed_jwks)
@@ -1985,22 +1984,6 @@ Maintains the sorted-by-issuer invariant in <code><a href="jwks.md#0x1_jwks_AllP
 
 
 
-<a id="@Specification_1_remove_oidc_provider_for_next_epoch"></a>
-
-### Function `remove_oidc_provider_for_next_epoch`
-
-
-<pre><code><b>public</b> <b>fun</b> <a href="jwks.md#0x1_jwks_remove_oidc_provider_for_next_epoch">remove_oidc_provider_for_next_epoch</a>(fx: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, name: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_Option">option::Option</a>&lt;<a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;&gt;
-</code></pre>
-
-
-
-
-<pre><code><b>pragma</b> verify = <b>false</b>;
-</code></pre>
-
-
-
 <a id="@Specification_1_on_new_epoch"></a>
 
 ### Function `on_new_epoch`
@@ -2126,7 +2109,10 @@ Maintains the sorted-by-issuer invariant in <code><a href="jwks.md#0x1_jwks_AllP
 
 
 
-<pre><code><b>pragma</b> verify = <b>false</b>;
+<pre><code><b>pragma</b> opaque;
+<b>ensures</b> <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_is_none">option::is_none</a>(result) &lt;==&gt; (<b>forall</b> jwk: <a href="jwks.md#0x1_jwks_ProviderJWKs">ProviderJWKs</a> <b>where</b> <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector_spec_contains">vector::spec_contains</a>(<b>old</b>(<a href="jwks.md#0x1_jwks">jwks</a>).entries, jwk): jwk.issuer != issuer);
+<b>ensures</b> <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_is_none">option::is_none</a>(result) ==&gt; <b>old</b>(<a href="jwks.md#0x1_jwks">jwks</a>) == <a href="jwks.md#0x1_jwks">jwks</a>;
+<b>ensures</b> <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_is_some">option::is_some</a>(result) ==&gt; <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector_spec_contains">vector::spec_contains</a>(<b>old</b>(<a href="jwks.md#0x1_jwks">jwks</a>).entries, <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_borrow">option::borrow</a>(result));
 </code></pre>
 
 
