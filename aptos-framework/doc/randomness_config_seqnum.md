@@ -5,39 +5,21 @@
 
 Randomness stall recovery utils.
 
-The right recovery procedure depends on what is broken:
-
-- Common case: randomness DKG output is stuck but consensus is still alive
-(the chain keeps producing blocks; only the epoch transition is wedged).
-Submit a governance proposal calling <code><a href="aptos_governance.md#0x1_aptos_governance_force_end_epoch">aptos_governance::force_end_epoch</a></code>.
-This invokes <code><a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish">reconfiguration_with_dkg::finish</a></code> directly, atomically
-clearing the lingering DKG session and advancing the epoch in a single
-Move transaction. No restarts, no local override, no operator-managed
-halt.
-
-- Rare case: a randomness/DKG-related bug breaks consensus itself, so the
-chain cannot make any progress (no governance txn can be committed).
-Recover by per-validator local override:
+When randomness generation is stuck due to a bug, the chain is also stuck. Below is the recovery procedure.
 1. Ensure more than 2/3 stakes are stuck at the same version.
-2. On every validator, set <code>consensus.sync_only = <b>true</b></code> and restart so
-the chain is uniformly halted (avoids execution divergence during the
-staggered application of the override in the next step).
-3. On every validator, set <code>randomness_override_seq_num</code> to <code>X+1</code> in the
-node config file (where <code>X</code> is the current <code><a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a></code>
-on chain), set <code>consensus.sync_only = <b>false</b></code>, and restart. The chain
-should then be unblocked.
-4. Once the bug is fixed and the binary + framework have been patched,
-a governance proposal is needed to set <code><a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a></code> to
-<code>X+2</code>.
+1. Every validator restarts with <code>randomness_override_seq_num</code> set to <code>X+1</code> in the node config file,
+where <code>X</code> is the current <code><a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a></code> on chain.
+1. The chain should then be unblocked.
+1. Once the bug is fixed and the binary + framework have been patched,
+a governance proposal is needed to set <code><a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a></code> to be <code>X+2</code>.
 
 
 -  [Resource `RandomnessConfigSeqNum`](#0x1_randomness_config_seqnum_RandomnessConfigSeqNum)
--  [Constants](#@Constants_0)
 -  [Function `set_for_next_epoch`](#0x1_randomness_config_seqnum_set_for_next_epoch)
 -  [Function `initialize`](#0x1_randomness_config_seqnum_initialize)
 -  [Function `on_new_epoch`](#0x1_randomness_config_seqnum_on_new_epoch)
--  [Specification](#@Specification_1)
-    -  [Function `on_new_epoch`](#@Specification_1_on_new_epoch)
+-  [Specification](#@Specification_0)
+    -  [Function `on_new_epoch`](#@Specification_0_on_new_epoch)
 
 
 <pre><code><b>use</b> <a href="config_buffer.md#0x1_config_buffer">0x1::config_buffer</a>;
@@ -75,28 +57,12 @@ Useful in a chain recovery from randomness stall.
 
 </details>
 
-<a id="@Constants_0"></a>
-
-## Constants
-
-
-<a id="0x1_randomness_config_seqnum_E_SEQ_NUM_MUST_INCREASE"></a>
-
-The new sequence number must be strictly greater than the current one.
-
-
-<pre><code><b>const</b> <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_E_SEQ_NUM_MUST_INCREASE">E_SEQ_NUM_MUST_INCREASE</a>: u64 = 1;
-</code></pre>
-
-
-
 <a id="0x1_randomness_config_seqnum_set_for_next_epoch"></a>
 
 ## Function `set_for_next_epoch`
 
 Update <code><a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a></code>.
 Used when re-enable randomness after an emergency randomness disable via local override.
-The new <code>seq_num</code> must be strictly greater than the current on-chain value.
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_set_for_next_epoch">set_for_next_epoch</a>(framework: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, seq_num: u64)
@@ -108,12 +74,8 @@ The new <code>seq_num</code> must be strictly greater than the current on-chain 
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_set_for_next_epoch">set_for_next_epoch</a>(framework: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, seq_num: u64) <b>acquires</b> <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a> {
+<pre><code><b>public</b> <b>fun</b> <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_set_for_next_epoch">set_for_next_epoch</a>(framework: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, seq_num: u64) {
     <a href="system_addresses.md#0x1_system_addresses_assert_aptos_framework">system_addresses::assert_aptos_framework</a>(framework);
-    <b>if</b> (<b>exists</b>&lt;<a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a>&gt;(@aptos_framework)) {
-        <b>let</b> current = <b>borrow_global</b>&lt;<a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a>&gt;(@aptos_framework).seq_num;
-        <b>assert</b>!(seq_num &gt; current, <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_E_SEQ_NUM_MUST_INCREASE">E_SEQ_NUM_MUST_INCREASE</a>);
-    };
     <a href="config_buffer.md#0x1_config_buffer_upsert">config_buffer::upsert</a>(<a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_RandomnessConfigSeqNum">RandomnessConfigSeqNum</a> { seq_num });
 }
 </code></pre>
@@ -183,12 +145,12 @@ Only used in reconfigurations to apply the pending <code>RandomnessConfig</code>
 
 </details>
 
-<a id="@Specification_1"></a>
+<a id="@Specification_0"></a>
 
 ## Specification
 
 
-<a id="@Specification_1_on_new_epoch"></a>
+<a id="@Specification_0_on_new_epoch"></a>
 
 ### Function `on_new_epoch`
 

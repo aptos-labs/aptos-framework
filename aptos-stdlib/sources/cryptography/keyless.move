@@ -37,7 +37,7 @@ module aptos_std::keyless {
     // Structs
     //
 
-    /// An *unvalidated* keyless public key
+    /// An *unvalidated* any public key: not necessarily an elliptic curve point, just a sequence of 32 bytes
     struct PublicKey has copy, drop, store {
         iss: String,
         idc: vector<u8>

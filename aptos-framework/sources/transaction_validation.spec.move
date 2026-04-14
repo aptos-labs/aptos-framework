@@ -90,7 +90,6 @@ spec aptos_framework::transaction_validation {
         txn_expiration_time: u64,
         chain_id: u8,
         is_simulation: bool,
-        txn_limits_request: Option<UserTxnLimitsRequest>,
     ) {
         // TODO(fa_migration)
         pragma verify = false;
@@ -443,15 +442,6 @@ spec aptos_framework::transaction_validation {
         pragma verify = false;
     }
 
-    spec versioned_prologue(sender: signer, fee_payer: signer, args: PrologueArgs) {
-        // TODO: temporary mockup
-        pragma verify = false;
-    }
-
-    spec versioned_epilogue(account: signer, fee_payer: signer, args: EpilogueArgs) {
-        // TODO: temporary mockup
-        pragma verify = false;
-    }
 
     spec schema EpilogueGasPayerAbortsIf {
         use std::option;

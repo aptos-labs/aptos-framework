@@ -9,25 +9,21 @@ Reconfiguration with DKG helper functions.
 -  [Function `try_start`](#0x1_reconfiguration_with_dkg_try_start)
 -  [Function `try_start_with_chunky_dkg`](#0x1_reconfiguration_with_dkg_try_start_with_chunky_dkg)
 -  [Function `finish`](#0x1_reconfiguration_with_dkg_finish)
--  [Function `try_finalize_reconfig`](#0x1_reconfiguration_with_dkg_try_finalize_reconfig)
+-  [Function `maybe_finish_reconfig_with_chunky_dkg`](#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg)
 -  [Function `finish_with_dkg_result`](#0x1_reconfiguration_with_dkg_finish_with_dkg_result)
 -  [Function `finish_with_chunky_dkg_result`](#0x1_reconfiguration_with_dkg_finish_with_chunky_dkg_result)
--  [Function `try_advance_reconfig`](#0x1_reconfiguration_with_dkg_try_advance_reconfig)
 -  [Specification](#@Specification_0)
     -  [Function `try_start`](#@Specification_0_try_start)
     -  [Function `try_start_with_chunky_dkg`](#@Specification_0_try_start_with_chunky_dkg)
     -  [Function `finish`](#@Specification_0_finish)
-    -  [Function `try_finalize_reconfig`](#@Specification_0_try_finalize_reconfig)
+    -  [Function `maybe_finish_reconfig_with_chunky_dkg`](#@Specification_0_maybe_finish_reconfig_with_chunky_dkg)
     -  [Function `finish_with_dkg_result`](#@Specification_0_finish_with_dkg_result)
     -  [Function `finish_with_chunky_dkg_result`](#@Specification_0_finish_with_chunky_dkg_result)
-    -  [Function `try_advance_reconfig`](#@Specification_0_try_advance_reconfig)
 
 
 <pre><code><b>use</b> <a href="chunky_dkg.md#0x1_chunky_dkg">0x1::chunky_dkg</a>;
 <b>use</b> <a href="chunky_dkg_config.md#0x1_chunky_dkg_config">0x1::chunky_dkg_config</a>;
-<b>use</b> <a href="chunky_dkg_config_seqnum.md#0x1_chunky_dkg_config_seqnum">0x1::chunky_dkg_config_seqnum</a>;
 <b>use</b> <a href="consensus_config.md#0x1_consensus_config">0x1::consensus_config</a>;
-<b>use</b> <a href="create_signer.md#0x1_create_signer">0x1::create_signer</a>;
 <b>use</b> <a href="decryption.md#0x1_decryption">0x1::decryption</a>;
 <b>use</b> <a href="dkg.md#0x1_dkg">0x1::dkg</a>;
 <b>use</b> <a href="execution_config.md#0x1_execution_config">0x1::execution_config</a>;
@@ -44,7 +40,6 @@ Reconfiguration with DKG helper functions.
 <b>use</b> <a href="reconfiguration_state.md#0x1_reconfiguration_state">0x1::reconfiguration_state</a>;
 <b>use</b> <a href="stake.md#0x1_stake">0x1::stake</a>;
 <b>use</b> <a href="system_addresses.md#0x1_system_addresses">0x1::system_addresses</a>;
-<b>use</b> <a href="timestamp.md#0x1_timestamp">0x1::timestamp</a>;
 <b>use</b> <a href="validator_consensus_info.md#0x1_validator_consensus_info">0x1::validator_consensus_info</a>;
 <b>use</b> <a href="version.md#0x1_version">0x1::version</a>;
 </code></pre>
@@ -76,14 +71,6 @@ Do nothing if one is already in progress.
             <b>return</b>
         }
     };
-    // V1 prologue dispatch means chunky DKG is not running this attempt;
-    // drop <a href="../../aptos-stdlib/doc/any.md#0x1_any">any</a> stale chunky session so finish_with_dkg_result can proceed
-    // (e.g., recovery from a stall via <b>local</b> chunky_dkg_override_seq_num).
-    <b>if</b> (<a href="chunky_dkg.md#0x1_chunky_dkg_incomplete_session">chunky_dkg::incomplete_session</a>().is_some()) {
-        <b>let</b> framework = <a href="create_signer.md#0x1_create_signer_create_signer">create_signer::create_signer</a>(@aptos_framework);
-        <a href="chunky_dkg.md#0x1_chunky_dkg_try_clear_incomplete_session">chunky_dkg::try_clear_incomplete_session</a>(&framework);
-    };
-
     <a href="reconfiguration_state.md#0x1_reconfiguration_state_on_reconfig_start">reconfiguration_state::on_reconfig_start</a>();
     <b>let</b> cur_epoch = <a href="reconfiguration.md#0x1_reconfiguration_current_epoch">reconfiguration::current_epoch</a>();
     <a href="dkg.md#0x1_dkg_start">dkg::start</a>(
@@ -175,7 +162,6 @@ Run the default reconfiguration to enter the new epoch.
     <a href="randomness_config_seqnum.md#0x1_randomness_config_seqnum_on_new_epoch">randomness_config_seqnum::on_new_epoch</a>(framework);
     <a href="randomness_config.md#0x1_randomness_config_on_new_epoch">randomness_config::on_new_epoch</a>(framework);
     <a href="randomness_api_v0_config.md#0x1_randomness_api_v0_config_on_new_epoch">randomness_api_v0_config::on_new_epoch</a>(framework);
-    <a href="chunky_dkg_config_seqnum.md#0x1_chunky_dkg_config_seqnum_on_new_epoch">chunky_dkg_config_seqnum::on_new_epoch</a>(framework);
     <a href="chunky_dkg_config.md#0x1_chunky_dkg_config_on_new_epoch">chunky_dkg_config::on_new_epoch</a>(framework);
     <a href="decryption.md#0x1_decryption_on_new_epoch">decryption::on_new_epoch</a>(framework);
     <a href="reconfiguration.md#0x1_reconfiguration_reconfigure">reconfiguration::reconfigure</a>();
@@ -186,22 +172,17 @@ Run the default reconfiguration to enter the new epoch.
 
 </details>
 
-<a id="0x1_reconfiguration_with_dkg_try_finalize_reconfig"></a>
+<a id="0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg"></a>
 
-## Function `try_finalize_reconfig`
+## Function `maybe_finish_reconfig_with_chunky_dkg`
 
-Single decision point for completing the in-progress reconfig.
-Calls finish(account) iff:
-- reconfiguration is in progress, AND
-- DKG has no in-progress session, AND
-- Chunky DKG has no in-progress session, OR the configured grace period
-(shadow mode) has elapsed since the chunky session started.
-No-op otherwise. Callers (finish_with_dkg_result,
-finish_with_chunky_dkg_result, try_complete_after_grace_period) just
-signal "something may have changed" and let this function decide.
+Call finish(account) only when (1) reconfiguration is in progress, and
+(2) both DKG and Chunky DKG have no in-progress session.
+Guard (1) ensures we never run reconfiguration twice (after the first
+finish(account), reconfig is no longer in progress).
 
 
-<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>)
+<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg">maybe_finish_reconfig_with_chunky_dkg</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>)
 </code></pre>
 
 
@@ -210,25 +191,13 @@ signal "something may have changed" and let this function decide.
 <summary>Implementation</summary>
 
 
-<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>) {
+<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg">maybe_finish_reconfig_with_chunky_dkg</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>) {
     <b>if</b> (!<a href="reconfiguration_state.md#0x1_reconfiguration_state_is_in_progress">reconfiguration_state::is_in_progress</a>()) { <b>return</b> };
-
-    // DKG must be done.
-    <b>if</b> (<a href="dkg.md#0x1_dkg_incomplete_session">dkg::incomplete_session</a>().is_some()) { <b>return</b> };
-
-    // Chunky DKG must be done OR its grace period (shadow mode) must have elapsed.
-    <b>let</b> chunky_session = <a href="chunky_dkg.md#0x1_chunky_dkg_incomplete_session">chunky_dkg::incomplete_session</a>();
-    <b>if</b> (chunky_session.is_some()) {
-        <b>let</b> grace_period = <a href="chunky_dkg_config.md#0x1_chunky_dkg_config_grace_period_secs">chunky_dkg_config::grace_period_secs</a>();
-        <b>if</b> (grace_period.is_none()) { <b>return</b> };
-        <b>let</b> start_time_us = <a href="chunky_dkg.md#0x1_chunky_dkg_session_start_time">chunky_dkg::session_start_time</a>(chunky_session.borrow());
-        <b>let</b> grace_period_us = (*grace_period.borrow()) * 1_000_000;
-        <b>if</b> (<a href="timestamp.md#0x1_timestamp_now_microseconds">timestamp::now_microseconds</a>() - start_time_us &lt; grace_period_us) {
-            <b>return</b>
-        };
-    };
-
-    <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish">finish</a>(<a href="account.md#0x1_account">account</a>);
+    <b>let</b> dkg_incomplete = <a href="dkg.md#0x1_dkg_incomplete_session">dkg::incomplete_session</a>();
+    <b>let</b> chunky_incomplete = <a href="chunky_dkg.md#0x1_chunky_dkg_incomplete_session">chunky_dkg::incomplete_session</a>();
+    <b>if</b> (dkg_incomplete.is_none() && chunky_incomplete.is_none()) {
+        <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish">finish</a>(<a href="account.md#0x1_account">account</a>);
+    }
 }
 </code></pre>
 
@@ -242,6 +211,8 @@ signal "something may have changed" and let this function decide.
 
 Complete the current DKG session with the given result.
 Aborts if no DKG session is in progress.
+If Chunky DKG is enabled, finish(account) is invoked only once both DKG and Chunky DKG
+have no in-progress session; otherwise finish(account) is invoked immediately.
 
 
 <pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish_with_dkg_result">finish_with_dkg_result</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, dkg_result: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;)
@@ -255,7 +226,11 @@ Aborts if no DKG session is in progress.
 
 <pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish_with_dkg_result">finish_with_dkg_result</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, dkg_result: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;) {
     <a href="dkg.md#0x1_dkg_finish">dkg::finish</a>(dkg_result);
-    <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(<a href="account.md#0x1_account">account</a>);
+    <b>if</b> (<a href="chunky_dkg_config.md#0x1_chunky_dkg_config_enabled">chunky_dkg_config::enabled</a>()) {
+        <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg">maybe_finish_reconfig_with_chunky_dkg</a>(<a href="account.md#0x1_account">account</a>);
+    } <b>else</b> {
+        <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish">finish</a>(<a href="account.md#0x1_account">account</a>);
+    }
 }
 </code></pre>
 
@@ -270,6 +245,8 @@ Aborts if no DKG session is in progress.
 Complete the current Chunky DKG session with the given result.
 No-op if Chunky DKG is not enabled.
 Buffers the derived encryption key for the next epoch.
+finish(account) is invoked only when both DKG and Chunky DKG have no in-progress session
+(via maybe_finish_reconfig_with_chunky_dkg).
 
 
 <pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish_with_chunky_dkg_result">finish_with_chunky_dkg_result</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, chunky_dkg_result: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;, encryption_key: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;)
@@ -291,38 +268,7 @@ Buffers the derived encryption key for the next epoch.
     <a href="chunky_dkg.md#0x1_chunky_dkg_finish">chunky_dkg::finish</a>(chunky_dkg_result);
     <b>let</b> next_epoch = <a href="reconfiguration.md#0x1_reconfiguration_current_epoch">reconfiguration::current_epoch</a>() + 1;
     <a href="decryption.md#0x1_decryption_set_for_next_epoch">decryption::set_for_next_epoch</a>(next_epoch, encryption_key);
-    <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(<a href="account.md#0x1_account">account</a>);
-}
-</code></pre>
-
-
-
-</details>
-
-<a id="0x1_reconfiguration_with_dkg_try_advance_reconfig"></a>
-
-## Function `try_advance_reconfig`
-
-Periodic finalization tick: try to advance the in-progress reconfig.
-Called from block_prologue_ext / block_prologue_ext_v2 every block
-after the epoch interval has elapsed. In V2 mode, also gives the
-grace-period (shadow-mode) escape a chance to fire. In V1 mode after
-a chunky-only override recovery, lets the reconfig finalize without
-re-dealing DKG (dkg::start is idempotent per epoch).
-
-
-<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_advance_reconfig">try_advance_reconfig</a>()
-</code></pre>
-
-
-
-<details>
-<summary>Implementation</summary>
-
-
-<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_advance_reconfig">try_advance_reconfig</a>() {
-    <b>let</b> framework = <a href="create_signer.md#0x1_create_signer_create_signer">create_signer::create_signer</a>(@aptos_framework);
-    <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(&framework);
+    <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg">maybe_finish_reconfig_with_chunky_dkg</a>(<a href="account.md#0x1_account">account</a>);
 }
 </code></pre>
 
@@ -427,12 +373,12 @@ re-dealing DKG (dkg::start is idempotent per epoch).
 
 
 
-<a id="@Specification_0_try_finalize_reconfig"></a>
+<a id="@Specification_0_maybe_finish_reconfig_with_chunky_dkg"></a>
 
-### Function `try_finalize_reconfig`
+### Function `maybe_finish_reconfig_with_chunky_dkg`
 
 
-<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_finalize_reconfig">try_finalize_reconfig</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>)
+<pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_maybe_finish_reconfig_with_chunky_dkg">maybe_finish_reconfig_with_chunky_dkg</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>)
 </code></pre>
 
 
@@ -468,22 +414,6 @@ re-dealing DKG (dkg::start is idempotent per epoch).
 
 
 <pre><code><b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_finish_with_chunky_dkg_result">finish_with_chunky_dkg_result</a>(<a href="account.md#0x1_account">account</a>: &<a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, chunky_dkg_result: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;, encryption_key: <a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;)
-</code></pre>
-
-
-
-
-<pre><code><b>pragma</b> verify = <b>false</b>;
-</code></pre>
-
-
-
-<a id="@Specification_0_try_advance_reconfig"></a>
-
-### Function `try_advance_reconfig`
-
-
-<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="reconfiguration_with_dkg.md#0x1_reconfiguration_with_dkg_try_advance_reconfig">try_advance_reconfig</a>()
 </code></pre>
 
 

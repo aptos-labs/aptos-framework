@@ -15,9 +15,6 @@ Standard math utilities missing in the Move Language.
 -  [Function `mul_div`](#0x1_math_fixed64_mul_div)
 -  [Function `exp_raw`](#0x1_math_fixed64_exp_raw)
 -  [Function `pow_raw`](#0x1_math_fixed64_pow_raw)
--  [Specification](#@Specification_1)
-    -  [Function `sqrt`](#@Specification_1_sqrt)
-    -  [Function `mul_div`](#@Specification_1_mul_div)
 
 
 <pre><code><b>use</b> <a href="fixed_point64.md#0x1_fixed_point64">0x1::fixed_point64</a>;
@@ -69,13 +66,9 @@ Square root of fixed point number
 
 <pre><code><b>public</b> <b>fun</b> <a href="math_fixed64.md#0x1_math_fixed64_sqrt">sqrt</a>(x: FixedPoint64): FixedPoint64 {
     <b>let</b> y = x.get_raw_value();
-    <b>if</b> (y == 0) {
-        <a href="fixed_point64.md#0x1_fixed_point64_create_from_raw_value">fixed_point64::create_from_raw_value</a>(0)
-    } <b>else</b> {
-        <b>let</b> z = (<a href="math128.md#0x1_math128_sqrt">math128::sqrt</a>(y) &lt;&lt; 32 <b>as</b> u256);
-        z = (z + ((y <b>as</b> u256) &lt;&lt; 64) / z) &gt;&gt; 1;
-        <a href="fixed_point64.md#0x1_fixed_point64_create_from_raw_value">fixed_point64::create_from_raw_value</a>((z <b>as</b> u128))
-    }
+    <b>let</b> z = (<a href="math128.md#0x1_math128_sqrt">math128::sqrt</a>(y) &lt;&lt; 32 <b>as</b> u256);
+    z = (z + ((y <b>as</b> u256) &lt;&lt; 64) / z) &gt;&gt; 1;
+    <a href="fixed_point64.md#0x1_fixed_point64_create_from_raw_value">fixed_point64::create_from_raw_value</a>((z <b>as</b> u128))
 }
 </code></pre>
 
@@ -295,46 +288,6 @@ Specialized function for x * y / z that omits intermediate shifting
 
 
 </details>
-
-<a id="@Specification_1"></a>
-
-## Specification
-
-
-<a id="@Specification_1_sqrt"></a>
-
-### Function `sqrt`
-
-
-<pre><code><b>public</b> <b>fun</b> <a href="math_fixed64.md#0x1_math_fixed64_sqrt">sqrt</a>(x: <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>): <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>
-</code></pre>
-
-
-
-
-<pre><code><b>aborts_if</b> [abstract] <b>false</b>;
-</code></pre>
-
-
-
-<a id="@Specification_1_mul_div"></a>
-
-### Function `mul_div`
-
-
-<pre><code><b>public</b> <b>fun</b> <a href="math_fixed64.md#0x1_math_fixed64_mul_div">mul_div</a>(x: <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>, y: <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>, z: <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>): <a href="fixed_point64.md#0x1_fixed_point64_FixedPoint64">fixed_point64::FixedPoint64</a>
-</code></pre>
-
-
-<code>mul_div</code> aborts when z is zero or when x * y / z overflows u128.
-The result equals the exact arithmetic quotient.
-
-
-<pre><code><b>aborts_if</b> z.get_raw_value() == 0;
-<b>aborts_if</b> (x.get_raw_value() <b>as</b> u256) * (y.get_raw_value() <b>as</b> u256) / (z.get_raw_value() <b>as</b> u256) &gt; MAX_U128;
-<b>ensures</b> (result.get_raw_value() <b>as</b> u256) ==
-        (x.get_raw_value() <b>as</b> u256) * (y.get_raw_value() <b>as</b> u256) / (z.get_raw_value() <b>as</b> u256);
-</code></pre>
 
 
 [move-book]: https://aptos.dev/move/book/SUMMARY
