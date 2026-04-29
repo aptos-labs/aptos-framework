@@ -72,7 +72,6 @@
 <pre><code><b>use</b> <a href="account.md#0x1_account">0x1::account</a>;
 <b>use</b> <a href="account_abstraction.md#0x1_account_abstraction">0x1::account_abstraction</a>;
 <b>use</b> <a href="aptos_account.md#0x1_aptos_account">0x1::aptos_account</a>;
-<b>use</b> <a href="../../aptos-stdlib/../move-stdlib/doc/bcs.md#0x1_bcs">0x1::bcs</a>;
 <b>use</b> <a href="chain_id.md#0x1_chain_id">0x1::chain_id</a>;
 <b>use</b> <a href="create_signer.md#0x1_create_signer">0x1::create_signer</a>;
 <b>use</b> <a href="../../aptos-stdlib/../move-stdlib/doc/features.md#0x1_features">0x1::features</a>;
@@ -266,12 +265,6 @@ against the framework version that shipped them and are not reached from this co
 
 
 <dl>
-<dt>
-<code>needs_fee_payer_auth_check: bool</code>
-</dt>
-<dd>
-
-</dd>
 <dt>
 <code>txn_sender_public_key: <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_Option">option::Option</a>&lt;<a href="../../aptos-stdlib/../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;&gt;</code>
 </dt>
@@ -745,21 +738,16 @@ Only called during genesis to initialize system resources for this module.
     // Check <b>if</b> the authentication key is valid
     <b>if</b> (!<a href="transaction_validation.md#0x1_transaction_validation_skip_auth_key_check">skip_auth_key_check</a>(is_simulation, &txn_authentication_key)) {
         <b>if</b> (txn_authentication_key.is_some()) {
-            <b>let</b> authentication_key = <b>if</b> (
-                sender_address != gas_payer_address &&
-                    !<a href="account.md#0x1_account_exists_at">account::exists_at</a>(sender_address) &&
-                    <a href="../../aptos-stdlib/../move-stdlib/doc/features.md#0x1_features_sponsored_automatic_account_creation_enabled">features::sponsored_automatic_account_creation_enabled</a>()
+            <b>if</b> (
+                sender_address == gas_payer_address ||
+                <a href="account.md#0x1_account_exists_at">account::exists_at</a>(sender_address) ||
+                !<a href="../../aptos-stdlib/../move-stdlib/doc/features.md#0x1_features_sponsored_automatic_account_creation_enabled">features::sponsored_automatic_account_creation_enabled</a>()
             ) {
-                // This is a sponsored transaction <b>with</b> <a href="account.md#0x1_account">account</a> that does
-                // not exist and there is no default <a href="account.md#0x1_account">account</a> resource.
-                <a href="../../aptos-stdlib/../move-stdlib/doc/bcs.md#0x1_bcs_to_bytes">bcs::to_bytes</a>(&sender_address)
-            } <b>else</b> {
-                <a href="account.md#0x1_account_get_authentication_key">account::get_authentication_key</a>(sender_address)
+                <b>assert</b>!(
+                    txn_authentication_key == <a href="../../aptos-stdlib/../move-stdlib/doc/option.md#0x1_option_some">option::some</a>(<a href="account.md#0x1_account_get_authentication_key">account::get_authentication_key</a>(sender_address)),
+                    <a href="../../aptos-stdlib/../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="transaction_validation.md#0x1_transaction_validation_PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY">PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY</a>),
+                );
             };
-            <b>assert</b>!(
-                txn_authentication_key.destroy_some() == authentication_key,
-                <a href="../../aptos-stdlib/../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="transaction_validation.md#0x1_transaction_validation_PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY">PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY</a>),
-            );
         } <b>else</b> {
             <b>assert</b>!(
                 <a href="transaction_validation.md#0x1_transaction_validation_allow_missing_txn_authentication_key">allow_missing_txn_authentication_key</a>(sender_address),
@@ -1879,7 +1867,6 @@ If there is no fee_payer, fee_payer = sender
 <pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_prologue">versioned_prologue</a>(sender: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_PrologueArgs">PrologueArgs</a>) {
     match (args) {
         V1 {
-            needs_fee_payer_auth_check,
             txn_sender_public_key,
             fee_payer_public_key_hash,
             replay_protector,
@@ -1910,8 +1897,8 @@ If there is no fee_payer, fee_payer = sender
                 is_simulation,
             );
 
-            <b>if</b> (needs_fee_payer_auth_check) {
-                <b>let</b> fee_payer_address = <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer_address_of">signer::address_of</a>(&fee_payer);
+            <b>let</b> fee_payer_address = <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer_address_of">signer::address_of</a>(&fee_payer);
+            <b>if</b> (fee_payer_address != <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer_address_of">signer::address_of</a>(&sender)) {
                 <b>if</b> (!<a href="transaction_validation.md#0x1_transaction_validation_skip_auth_key_check">skip_auth_key_check</a>(is_simulation, &fee_payer_public_key_hash)) {
                     <b>if</b> (fee_payer_public_key_hash.is_some()) {
                         <b>let</b> fee_payer_public_key_hash = fee_payer_public_key_hash.destroy_some();
@@ -1942,7 +1929,7 @@ If there is no fee_payer, fee_payer = sender
 
 
 
-<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(sender: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">transaction_validation::EpilogueArgs</a>)
+<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(<a href="account.md#0x1_account">account</a>: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">transaction_validation::EpilogueArgs</a>)
 </code></pre>
 
 
@@ -1951,7 +1938,7 @@ If there is no fee_payer, fee_payer = sender
 <summary>Implementation</summary>
 
 
-<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(sender: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">EpilogueArgs</a>) {
+<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(<a href="account.md#0x1_account">account</a>: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">EpilogueArgs</a>) {
     match (args) {
         V1 {
             fee_statement,
@@ -1962,7 +1949,7 @@ If there is no fee_payer, fee_payer = sender
             is_orderless_txn,
         } =&gt; {
             <a href="transaction_validation.md#0x1_transaction_validation_unified_epilogue_v2">unified_epilogue_v2</a>(
-                sender,
+                <a href="account.md#0x1_account">account</a>,
                 fee_payer,
                 fee_statement.storage_fee_refund_octas(),
                 txn_gas_price,
@@ -2529,7 +2516,7 @@ Skip transaction_fee::burn_fee verification.
 ### Function `versioned_epilogue`
 
 
-<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(sender: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">transaction_validation::EpilogueArgs</a>)
+<pre><code><b>fun</b> <a href="transaction_validation.md#0x1_transaction_validation_versioned_epilogue">versioned_epilogue</a>(<a href="account.md#0x1_account">account</a>: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, fee_payer: <a href="../../aptos-stdlib/../move-stdlib/doc/signer.md#0x1_signer">signer</a>, args: <a href="transaction_validation.md#0x1_transaction_validation_EpilogueArgs">transaction_validation::EpilogueArgs</a>)
 </code></pre>
 
 
