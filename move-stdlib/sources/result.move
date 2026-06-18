@@ -9,7 +9,7 @@ module std::result {
     const E_UNWRAP_ERR: u64 = 1;
 
     /// Represents the result of some computation, either a value `T` or an error `E`.
-    public enum Result<T, E> has copy, store {
+    enum Result<T, E> has copy, store {
         Ok(T),
         Err(E)
     }
@@ -40,6 +40,8 @@ module std::result {
         }
     }
 
+    // TODO: add below functions once language version 2.4 is enabled
+    /*
     /// Maps a `T` if it is available.
     public inline fun map<T, E, TNew>(self: Result<T, E>, f: |T|TNew): Result<TNew, E> {
         match (self) {
@@ -71,4 +73,5 @@ module std::result {
             ok => ok
         }
     }
+    */
 }

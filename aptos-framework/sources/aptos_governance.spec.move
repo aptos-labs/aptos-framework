@@ -32,6 +32,13 @@ spec aptos_framework::aptos_governance {
         pragma aborts_if_is_partial;
     }
 
+    spec schema AbortsIfPermissionedSigner {
+        use aptos_framework::permissioned_signer;
+        s: signer;
+        let perm = GovernancePermission {};
+        aborts_if !permissioned_signer::spec_check_permission_exists(s, perm);
+    }
+
     spec store_signer_cap(
         aptos_framework: &signer,
         signer_address: address,
@@ -185,6 +192,7 @@ spec aptos_framework::aptos_governance {
         metadata_hash: vector<u8>,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
         requires chain_status::is_operating();
         include CreateProposalAbortsIf;
     }
@@ -198,6 +206,7 @@ spec aptos_framework::aptos_governance {
         is_multi_step_proposal: bool,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
         requires chain_status::is_operating();
         include CreateProposalAbortsIf;
     }
@@ -211,8 +220,10 @@ spec aptos_framework::aptos_governance {
         is_multi_step_proposal: bool,
     ): u64 {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
         requires chain_status::is_operating();
         include CreateProposalAbortsIf;
+        // include AbortsIfPermissionedSigner { s: proposer };
     }
 
     /// `stake_pool` must exist StakePool.
@@ -299,6 +310,7 @@ spec aptos_framework::aptos_governance {
         should_pass: bool,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
 
         requires chain_status::is_operating();
         include VoteAbortIf  {
@@ -318,6 +330,7 @@ spec aptos_framework::aptos_governance {
         should_pass: bool,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
 
         requires chain_status::is_operating();
         include VoteAbortIf;
@@ -335,6 +348,7 @@ spec aptos_framework::aptos_governance {
         should_pass: bool,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 60;
 
         requires chain_status::is_operating();
         include VoteAbortIf;
@@ -744,6 +758,8 @@ spec aptos_framework::aptos_governance {
         use aptos_framework::chain_status;
         requires chain_status::is_operating();
 
+        // TODO: These function passed locally however failed in github CI
+        pragma verify_duration_estimate = 120;
         // verify voting::resolve_proposal_v2
         include VotingIsProposalResolvableAbortsif;
 

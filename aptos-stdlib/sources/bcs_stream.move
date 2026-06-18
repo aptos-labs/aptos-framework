@@ -46,14 +46,7 @@ module aptos_std::bcs_stream {
         let res = 0;
         let shift = 0;
 
-        while ({
-            spec {
-                invariant stream.data == old(stream).data;
-                invariant stream.cur >= old(stream).cur;
-                invariant shift <= (64 as u8);
-            };
-            stream.cur < stream.data.length()
-        }) {
+        while (stream.cur < stream.data.length()) {
             let byte = stream.data[stream.cur];
             stream.cur += 1;
 

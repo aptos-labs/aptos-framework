@@ -146,6 +146,7 @@ spec aptos_framework::stake {
     ) {
         pragma verify = false;
 
+        include AbortsIfSignerPermissionStake { s: account };
         let pubkey_from_pop = bls12381::spec_public_key_from_bytes_with_pop(
             consensus_pubkey,
             proof_of_possession_from_bytes(proof_of_possession)
@@ -191,6 +192,7 @@ spec aptos_framework::stake {
         // This function casue timeout (property proved)
         pragma verify_duration_estimate = 60;
         pragma disable_invariants_in_body;
+        include AbortsIfSignerPermissionStake { s: operator };
         aborts_if !staking_config::get_allow_validator_set_change(staking_config::get());
         aborts_if !exists<StakePool>(pool_address);
         aborts_if !exists<ValidatorConfig>(pool_address);
@@ -213,16 +215,7 @@ spec aptos_framework::stake {
             );
 
         let config = staking_config::get();
-        let merge_expired_pending_inactive = stake_pool.locked_until_secs > 0
-            && timestamp::spec_now_seconds() >= stake_pool.locked_until_secs;
-        let effective_pending_inactive = if (merge_expired_pending_inactive) {
-            0
-        } else {
-            stake_pool.pending_inactive.value
-        };
-        let voting_power = stake_pool.active.value
-            + stake_pool.pending_active.value
-            + effective_pending_inactive;
+        let voting_power = get_voting_power(stake_pool);
 
         let minimum_stake = config.minimum_stake;
         let maximum_stake = config.maximum_stake;
@@ -261,6 +254,7 @@ spec aptos_framework::stake {
     spec withdraw(owner: &signer, withdraw_amount: u64) {
         // TODO(fa_migration)
         pragma verify = false;
+        include AbortsIfSignerPermissionStake { s: owner };
         aborts_if reconfiguration_state::spec_is_in_progress();
         let addr = signer::address_of(owner);
         let ownership_cap = global<OwnerCapability>(addr);
@@ -320,6 +314,7 @@ spec aptos_framework::stake {
     spec leave_validator_set(operator: &signer, pool_address: address) {
         pragma disable_invariants_in_body;
         requires chain_status::is_operating();
+        include AbortsIfSignerPermissionStake { s: operator };
         aborts_if reconfiguration_state::spec_is_in_progress();
         let config = staking_config::get();
         aborts_if !staking_config::get_allow_validator_set_change(config);
@@ -368,12 +363,14 @@ spec aptos_framework::stake {
     spec extract_owner_cap(owner: &signer): OwnerCapability {
         // TODO: set because of timeout (property proved)
         pragma verify_duration_estimate = 300;
+        include AbortsIfSignerPermissionStake { s: owner };
         let owner_address = signer::address_of(owner);
         aborts_if !exists<OwnerCapability>(owner_address);
         ensures !exists<OwnerCapability>(owner_address);
     }
 
     spec deposit_owner_cap(owner: &signer, owner_cap: OwnerCapability) {
+        include AbortsIfSignerPermissionStake { s: owner };
         let owner_address = signer::address_of(owner);
         aborts_if exists<OwnerCapability>(owner_address);
         ensures exists<OwnerCapability>(owner_address);
@@ -381,6 +378,8 @@ spec aptos_framework::stake {
     }
 
     spec unlock_with_cap(amount: u64, owner_cap: &OwnerCapability) {
+        // TODO: set because of timeout (property proved)
+        pragma verify_duration_estimate = 300;
         let pool_address = owner_cap.pool_address;
         let pre_stake_pool = global<StakePool>(pool_address);
         let post stake_pool = global<StakePool>(pool_address);
@@ -421,6 +420,7 @@ spec aptos_framework::stake {
         new_network_addresses: vector<u8>,
         new_fullnode_addresses: vector<u8>
     ) {
+        include AbortsIfSignerPermissionStake { s: operator };
         let pre_stake_pool = global<StakePool>(pool_address);
         let post validator_info = global<ValidatorConfig>(pool_address);
         modifies global<ValidatorConfig>(pool_address);
@@ -470,6 +470,7 @@ spec aptos_framework::stake {
         new_consensus_pubkey: vector<u8>,
         proof_of_possession: vector<u8>
     ) {
+        include AbortsIfSignerPermissionStake { s: operator };
         let pre_stake_pool = global<StakePool>(pool_address);
         let post validator_info = global<ValidatorConfig>(pool_address);
         aborts_if reconfiguration_state::spec_is_in_progress();
@@ -494,11 +495,6 @@ spec aptos_framework::stake {
         aborts_if !exists<StakePool>(pool_address);
         modifies global<StakePool>(pool_address);
         ensures post_stake_pool.delegated_voter == new_voter;
-    }
-
-    spec initialize_pending_transaction_fee {
-        pragma verify = false; // TODO: set because of timeout.
-        modifies global<PendingTransactionFee>(@aptos_framework);
     }
 
     spec on_new_epoch {
@@ -526,7 +522,6 @@ spec aptos_framework::stake {
         requires chain_status::is_operating();
         // This function should never abort.
         aborts_if false;
-        modifies global<ValidatorPerformance>(@aptos_framework);
 
         let validator_perf = global<ValidatorPerformance>(@aptos_framework);
         let post post_validator_perf = global<ValidatorPerformance>(@aptos_framework);
@@ -631,6 +626,13 @@ spec aptos_framework::stake {
         };
     }
 
+    spec schema AbortsIfSignerPermissionStake {
+        use aptos_framework::permissioned_signer;
+        s: signer;
+        let perm = StakeManagementPermission {};
+        aborts_if !permissioned_signer::spec_check_permission_exists(s, perm);
+    }
+
     spec schema UpdateStakePoolAbortsIf {
         use aptos_std::type_info;
 
@@ -651,7 +653,6 @@ spec aptos_framework::stake {
     }
 
     spec distribute_rewards {
-        pragma opaque;
         pragma aborts_if_is_partial;
         include ResourceRequirement;
         requires rewards_rate <= MAX_REWARDS_RATE;
@@ -704,26 +705,25 @@ spec aptos_framework::stake {
                 rewards_rate_denominator
             )
         } else { 0 };
+        let amount = rewards_amount;
         let addr = type_info::type_of<AptosCoin>().account_address;
         aborts_if (rewards_amount > 0) && !exists<coin::CoinInfo<AptosCoin>>(addr);
-        aborts_if (rewards_amount > 0) && (stake.value + rewards_amount > MAX_U64);
         modifies global<coin::CoinInfo<AptosCoin>>(addr);
+        include (rewards_amount > 0) ==>
+            coin::CoinAddAbortsIf<AptosCoin> { amount: amount };
     }
 
     spec get_reconfig_start_time_secs(): u64 {
         include GetReconfigStartTimeRequirement;
-        aborts_if false;
-        ensures result == spec_get_reconfig_start_time_secs();
     }
 
     spec schema GetReconfigStartTimeRequirement {
         requires exists<timestamp::CurrentTimeMicroseconds>(@aptos_framework);
-        include reconfiguration_state::spec_is_in_progress() ==>
-            reconfiguration_state::StartTimeSecsRequirement;
+        include reconfiguration_state::StartTimeSecsRequirement;
     }
 
     spec fun spec_get_reconfig_start_time_secs(): u64 {
-        if (reconfiguration_state::spec_is_in_progress()) {
+        if (exists<reconfiguration_state::State>(@aptos_framework)) {
             reconfiguration_state::spec_start_time_secs()
         } else {
             timestamp::spec_now_seconds()
@@ -767,8 +767,6 @@ spec aptos_framework::stake {
 
     spec find_validator {
         pragma opaque;
-        // Override module-level `aborts_if_is_partial` so the declared `aborts_if false` is honored.
-        pragma aborts_if_is_partial = false;
         aborts_if false;
         ensures option::is_none(result) ==>
             (forall i in 0..len(v): v[i].addr != addr);
@@ -845,6 +843,7 @@ spec aptos_framework::stake {
         pragma verify = false;
         // TODO(fa_migration)
         pragma aborts_if_is_partial;
+        include AbortsIfSignerPermissionStake { s: owner };
         aborts_if reconfiguration_state::spec_is_in_progress();
         include ResourceRequirement;
         include AddStakeAbortsIfAndEnsures;
@@ -857,6 +856,7 @@ spec aptos_framework::stake {
         pragma verify_duration_estimate = 120;
         pragma verify = false;
         pragma aborts_if_is_partial;
+        include AbortsIfSignerPermissionStake { s: owner };
         include ResourceRequirement;
         let addr = signer::address_of(owner);
         ensures global<ValidatorConfig>(addr)

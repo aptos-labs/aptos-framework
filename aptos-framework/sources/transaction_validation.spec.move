@@ -28,12 +28,16 @@ spec aptos_framework::transaction_validation {
         pragma aborts_if_is_strict;
     }
 
-    spec grant_gas_permission {
-        aborts_if true;
+    spec grant_gas_permission(
+        master: &signer,
+        permissioned: &signer,
+        gas_amount: u64
+    ) {
+        pragma aborts_if_is_partial;
     }
 
-    spec revoke_gas_permission {
-        aborts_if true;
+    spec revoke_gas_permission(permissioned: &signer) {
+        pragma aborts_if_is_partial;
     }
 
     /// Ensure caller is `aptos_framework`.
@@ -205,6 +209,7 @@ spec aptos_framework::transaction_validation {
         chain_id: u8,
         is_simulation: bool,
     ) {
+        pragma verify_duration_estimate = 120;
         let gas_payer = sender;
         // TODO(fa_migration)
         pragma verify = false;

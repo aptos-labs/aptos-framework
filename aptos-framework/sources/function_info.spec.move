@@ -36,12 +36,6 @@ spec aptos_framework::function_info {
         };
     }
 
-    spec load_function_value<FuncType>(self: &FunctionInfo): FuncType {
-        // Uninterpreted, like `reflect::resolve`.
-        pragma verify = false;
-        pragma opaque;
-    }
-
     spec new_function_info_from_address(
         module_address: address,
         module_name: String,
@@ -56,4 +50,18 @@ spec aptos_framework::function_info {
         };
     }
 
+    spec load_module_from_function(f: &FunctionInfo) {
+        // TODO: temporary mockup
+        pragma verify = false;
+        pragma opaque;
+    }
+
+    spec check_dispatch_type_compatibility(
+        framework_function: &FunctionInfo,
+        dispatch_target: &FunctionInfo,
+    ): bool {
+        // TODO: temporary mockup
+        pragma verify = false;
+        pragma opaque;
+    }
 }

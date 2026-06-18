@@ -671,15 +671,14 @@ module std::features {
         true
     }
 
+    const PERMISSIONED_SIGNER: u64 = 84;
 
-    #[deprecated]
     public fun get_permissioned_signer_feature(): u64 {
-        abort error::invalid_argument(EINVALID_FEATURE)
+        PERMISSIONED_SIGNER
     }
 
-    #[deprecated]
     public fun is_permissioned_signer_enabled(): bool {
-        false
+        is_enabled(PERMISSIONED_SIGNER)
     }
 
     /// Whether the account abstraction is enabled.
@@ -847,18 +846,6 @@ module std::features {
         is_enabled(ENCRYPTED_TRANSACTIONS)
     }
 
-    /// Whether multisig script payloads are enabled. Allows multisig accounts to
-    /// propose and execute Move script payloads, not just entry functions.
-    const MULTISIG_SCRIPT: u64 = 110;
-
-    public fun get_multisig_script_feature(): u64 {
-        MULTISIG_SCRIPT
-    }
-
-    public fun is_multisig_script_enabled(): bool {
-        is_enabled(MULTISIG_SCRIPT)
-    }
-
     /// Whether the transaction limits feature is enabled. Allows transactions
     /// to request higher execution/IO gas limits backed by staking voting power.
     const TRANSACTION_LIMITS: u64 = 111;
@@ -897,94 +884,10 @@ module std::features {
     /// Lifetime: permanent
     const HOTNESS_IN_EPILOGUE: u64 = 116;
 
-    /// When enabled, execution assembles `TransactionInfoV1` instead of `TransactionInfoV0`.
+    /// When enabled, execution assembles `TransactionInfoV1`, which carries the hot
+    /// state root hash, so it is committed to the ledger accumulator.
     /// Lifetime: permanent
     const TRANSACTION_INFO_V1: u64 = 117;
-
-    /// Umbrella auth flag for the native-trading subsystem; the per-store
-    /// flags below gate the actual writes. Both must be on to write.
-    const TRADING_NATIVE: u64 = 118;
-
-    public fun get_trading_native_feature(): u64 {
-        TRADING_NATIVE
-    }
-
-    public fun is_trading_native_enabled(): bool {
-        is_enabled(TRADING_NATIVE)
-    }
-
-    /// Gates native-position writes.
-    const NATIVE_POSITION: u64 = 119;
-
-    public fun get_native_position_feature(): u64 {
-        NATIVE_POSITION
-    }
-
-    public fun is_native_position_enabled(): bool {
-        is_enabled(NATIVE_POSITION)
-    }
-
-    /// Gates native-orderbook writes.
-    const NATIVE_ORDERBOOK: u64 = 120;
-
-    public fun get_native_orderbook_feature(): u64 {
-        NATIVE_ORDERBOOK
-    }
-
-    public fun is_native_orderbook_enabled(): bool {
-        is_enabled(NATIVE_ORDERBOOK)
-    }
-
-    /// Gates native-collateral writes.
-    const NATIVE_COLLATERAL: u64 = 121;
-
-    public fun get_native_collateral_feature(): u64 {
-        NATIVE_COLLATERAL
-    }
-
-    public fun is_native_collateral_enabled(): bool {
-        is_enabled(NATIVE_COLLATERAL)
-    }
-
-    /// When enabled, execution computes the trading-native state roots and commits them to
-    /// `TransactionInfoV1`, so they are consensus-verified. Requires `TRANSACTION_INFO_V1`.
-    /// Covers the native-position tree today and is intended to cover the other trading-native
-    /// trees as they are added. Enabling it first commits the (empty-tree) roots to transaction
-    /// info; the actual Move-side writes to those trees are gated by separate flags.
-    /// Lifetime: permanent
-    const COMPUTE_TRADING_NATIVE_STATE_ROOTS: u64 = 122;
-
-    /// When enabled together with `TRANSACTION_INFO_V1`, execution populates
-    /// `TransactionInfoV1`'s hot state root hash, so it is committed to the ledger
-    /// accumulator. Requires `TRANSACTION_INFO_V1`.
-    /// Lifetime: permanent
-    const HOT_STATE_ROOT_IN_TXN_INFO: u64 = 123;
-
-    /// When enabled, the gas refund in the epilogue mints APT directly as a fungible asset
-    /// via the paired `MintRef` (stored in `transaction_fee::AptosFAMintCapabilities`), instead
-    /// of minting a coin and converting it. This avoids touching the legacy coin supply
-    /// aggregator (v1), reducing Block-STM contention on refund transactions.
-    /// Lifetime: transient
-    const GAS_REFUND_FA_MINT: u64 = 124;
-
-    public fun gas_refund_fa_mint_enabled(): bool {
-        is_enabled(GAS_REFUND_FA_MINT)
-    }
-
-    /// Whether `FunctionInfo`-based dispatch (dispatchable fungible assets and account
-    /// abstraction) runs via function values from `std::reflect` instead of the legacy
-    /// native dispatch machinery. Requires `FUNCTION_REFLECTION`.
-    /// Lifetime: transient
-    const FUNCTION_VALUE_DISPATCH: u64 = 125;
-
-    public fun get_function_value_dispatch_feature(): u64 {
-        FUNCTION_VALUE_DISPATCH
-    }
-
-    /// Requires function reflection, without which function-value dispatch stays disabled.
-    public fun is_function_value_dispatch_enabled(): bool {
-        is_enabled(FUNCTION_VALUE_DISPATCH) && is_enabled(FUNCTION_REFLECTION)
-    }
 
     // ============================================================================================
     // Feature Flag Implementation

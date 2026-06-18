@@ -112,6 +112,13 @@ spec aptos_framework::vesting {
             global<VestingContract>(a).grant_pool.shareholders_limit <= MAXIMUM_SHAREHOLDERS;
     }
 
+    spec schema AbortsIfPermissionedSigner {
+        use aptos_framework::permissioned_signer;
+        s: signer;
+        let perm = VestPermission {};
+        aborts_if !permissioned_signer::spec_check_permission_exists(s, perm);
+    }
+
     spec stake_pool_address(vesting_contract_address: address): address {
         aborts_if !exists<VestingContract>(vesting_contract_address);
     }
@@ -383,6 +390,7 @@ spec aptos_framework::vesting {
         contract_address: address,
         new_voter: address,
     ) {
+        // TODO: set because of timeout (property proved)
         pragma verify_duration_estimate = 300;
         include VerifyAdminAbortsIf;
 
@@ -397,6 +405,8 @@ spec aptos_framework::vesting {
         admin: &signer,
         contract_address: address,
     ) {
+        // TODO: set because of timeout (property proved)
+        pragma verify_duration_estimate = 300;
         aborts_if !exists<VestingContract>(contract_address);
         let vesting_contract = global<VestingContract>(contract_address);
         aborts_if signer::address_of(admin) != vesting_contract.admin;
@@ -419,9 +429,12 @@ spec aptos_framework::vesting {
         shareholder: address,
         new_beneficiary: address,
     ) {
+        // TODO: set because of timeout (property proved)
         pragma verify_duration_estimate = 300;
         pragma aborts_if_is_partial;
         aborts_if !account::spec_exists_at(new_beneficiary);
+        // TODO(fa_migration)
+        // aborts_if !coin::spec_is_account_registered<AptosCoin>(new_beneficiary);
         include VerifyAdminAbortsIf;
         let post vesting_contract = global<VestingContract>(contract_address);
         ensures simple_map::spec_contains_key(vesting_contract.beneficiaries,shareholder);
@@ -510,7 +523,7 @@ spec aptos_framework::vesting {
         let resource_addr = account::spec_create_resource_address(admin_addr, end);
         aborts_if !exists<AdminStore>(admin_addr);
         aborts_if len(account::ZERO_AUTH_KEY) != 32;
-        aborts_if admin_store.nonce + (1 as u64) > (MAX_U64 as u64);
+        aborts_if admin_store.nonce + 1 > MAX_U64;
         let ea = account::spec_exists_at(resource_addr);
         include if (ea) account::CreateResourceAccountAbortsIf else account::CreateAccountAbortsIf {addr: resource_addr};
 
@@ -527,8 +540,10 @@ spec aptos_framework::vesting {
 
     spec verify_admin(admin: &signer, vesting_contract: &VestingContract) {
         pragma verify_duration_estimate = 120;
+        aborts_if permissioned_signer::spec_is_permissioned_signer(admin);
         /// [high-level-req-9]
         aborts_if signer::address_of(admin) != vesting_contract.admin;
+        // include AbortsIfPermissionedSigner { s: admin };
     }
 
     spec assert_vesting_contract_exists(contract_address: address) {
@@ -627,6 +642,7 @@ spec aptos_framework::vesting {
         contract_address: address;
         admin: signer;
 
+        aborts_if permissioned_signer::spec_is_permissioned_signer(admin);
         aborts_if !exists<VestingContract>(contract_address);
         let vesting_contract = global<VestingContract>(contract_address);
         aborts_if signer::address_of(admin) != vesting_contract.admin;

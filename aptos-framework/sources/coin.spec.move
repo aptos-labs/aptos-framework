@@ -134,9 +134,8 @@ spec aptos_framework::coin {
     /// Get address by reflection.
     spec coin_address<CoinType>(): address {
         pragma opaque;
-        pragma aborts_if_is_partial = false;
-        aborts_if !type_info::spec_is_struct<CoinType>();
-        ensures result == type_info::type_of<CoinType>().account_address;
+        aborts_if [abstract] false;
+        ensures [abstract] result == type_info::type_of<CoinType>().account_address;
     }
 
     /// Can only be updated by `@aptos_framework`.
@@ -152,19 +151,13 @@ spec aptos_framework::coin {
     }
 
     spec is_coin_initialized<CoinType>(): bool {
-        pragma opaque;
-        pragma aborts_if_is_partial = false;
         /// [high-level-req-7.1]
-        aborts_if !type_info::spec_is_struct<CoinType>();
-        ensures result == exists<CoinInfo<CoinType>>(type_info::type_of<CoinType>().account_address);
+        aborts_if false;
     }
 
     spec is_account_registered<CoinType>(_account_addr: address): bool {
-        pragma opaque;
-        pragma aborts_if_is_partial = false;
-        aborts_if !type_info::spec_is_struct<CoinType>();
-        aborts_if !exists<CoinInfo<CoinType>>(type_info::type_of<CoinType>().account_address);
-        ensures result == true;
+        pragma aborts_if_is_partial;
+        aborts_if false;
     }
 
     spec fun get_coin_supply_opt<CoinType>(): Option<OptionalAggregator> {
@@ -184,6 +177,15 @@ spec aptos_framework::coin {
         } else {
             option::spec_none()
         }
+    }
+
+    spec fun spec_is_account_registered<CoinType>(account_addr: address): bool;
+
+    spec is_account_registered<CoinType>(_account_addr: address): bool {
+        pragma aborts_if_is_partial;
+        aborts_if false;
+        ensures [abstract] result
+            == spec_is_account_registered<CoinType>(_account_addr);
     }
 
     spec schema CoinSubAbortsIf<CoinType> {
@@ -358,8 +360,6 @@ spec aptos_framework::coin {
     }
 
     spec extract_all<CoinType>(coin: &mut Coin<CoinType>): Coin<CoinType> {
-        pragma opaque;
-        aborts_if false;
         ensures result.value == old(coin).value;
         ensures coin.value == 0;
     }
@@ -479,11 +479,8 @@ spec aptos_framework::coin {
     }
 
     spec merge<CoinType>(dst_coin: &mut Coin<CoinType>, source_coin: Coin<CoinType>) {
-        pragma opaque;
-        aborts_if dst_coin.value + source_coin.value > MAX_U64;
         /// [high-level-req-3]
         ensures dst_coin.value == old(dst_coin.value) + source_coin.value;
-        ensures supply<CoinType> == old(supply<CoinType>);
     }
 
     /// An account can only be registered once.

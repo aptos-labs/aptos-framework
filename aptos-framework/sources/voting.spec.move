@@ -43,7 +43,15 @@ spec aptos_framework::voting {
         pragma aborts_if_is_partial;
     }
 
+    spec schema AbortsIfPermissionedSigner {
+        use aptos_framework::permissioned_signer;
+        s: signer;
+        let perm = VotePermission {};
+        aborts_if !permissioned_signer::spec_check_permission_exists(s, perm);
+    }
+
     spec register<ProposalType: store>(account: &signer) {
+        // include AbortsIfPermissionedSigner { s: account };
         let addr = signer::address_of(account);
 
         // Will abort if there's already a `VotingForum<ProposalType>` under addr
@@ -248,6 +256,7 @@ spec aptos_framework::voting {
         next_execution_hash: vector<u8>,
     ) {
         use aptos_framework::chain_status;
+        pragma verify_duration_estimate = 300;
         // Ensures existence of Timestamp
         requires chain_status::is_operating();
 

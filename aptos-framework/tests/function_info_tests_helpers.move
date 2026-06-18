@@ -11,6 +11,4 @@ module aptos_framework::function_info_tests_helpers {
     public fun lhs_generic<T>(_s: &FunctionInfo) {}
 
     public fun rhs_generic<T>() {}
-
-    public fun pass_signer(s: signer): signer { s }
 }

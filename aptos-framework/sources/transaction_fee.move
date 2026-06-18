@@ -3,10 +3,9 @@ module aptos_framework::transaction_fee {
     use aptos_framework::coin::{Self, AggregatableCoin, BurnCapability, MintCapability};
     use aptos_framework::aptos_account;
     use aptos_framework::aptos_coin::AptosCoin;
-    use aptos_framework::fungible_asset::{BurnRef, MintRef};
+    use aptos_framework::fungible_asset::BurnRef;
     use aptos_framework::system_addresses;
     use std::error;
-    use std::features;
     use std::option::Option;
     use aptos_framework::event;
 
@@ -30,15 +29,9 @@ module aptos_framework::transaction_fee {
         burn_ref: BurnRef
     }
 
-    /// Stores the coin mint capability to mint the refunds. Used as the fallback path when
-    /// `GAS_REFUND_FA_MINT` is disabled or `AptosFAMintCapabilities` is not yet published.
+    /// Stores mint capability to mint the refunds.
     struct AptosCoinMintCapability has key {
         mint_cap: MintCapability<AptosCoin>
-    }
-
-    /// Stores mint ref to mint the refunds as APT FA. Used when `GAS_REFUND_FA_MINT` is enabled.
-    struct AptosFAMintCapabilities has key {
-        mint_ref: MintRef
     }
 
     #[event]
@@ -86,15 +79,9 @@ module aptos_framework::transaction_fee {
     friend fun mint_and_refund(
         account: address, refund: u64
     ) {
-        if (features::gas_refund_fa_mint_enabled()
-            && exists<AptosFAMintCapabilities>(@aptos_framework)) {
-            let mint_ref = &AptosFAMintCapabilities[@aptos_framework].mint_ref;
-            aptos_account::mint_to_fungible_store_for_gas(mint_ref, account, refund);
-        } else {
-            let mint_cap = &AptosCoinMintCapability[@aptos_framework].mint_cap;
-            let refund_coin = coin::mint(refund, mint_cap);
-            coin::deposit_for_gas_fee(account, refund_coin);
-        }
+        let mint_cap = &AptosCoinMintCapability[@aptos_framework].mint_cap;
+        let refund_coin = coin::mint(refund, mint_cap);
+        coin::deposit_for_gas_fee(account, refund_coin);
     }
 
     /// Only called during genesis.
@@ -112,23 +99,7 @@ module aptos_framework::transaction_fee {
         aptos_framework: &signer, mint_cap: MintCapability<AptosCoin>
     ) {
         system_addresses::assert_aptos_framework(aptos_framework);
-        // Store the FA mint ref (used when GAS_REFUND_FA_MINT is enabled) and keep the legacy
-        // coin mint cap as the fallback, so the feature flag remains a safe two-way switch.
-        let mint_ref = coin::get_paired_mint_copy_ref(&mint_cap);
-        move_to(aptos_framework, AptosFAMintCapabilities { mint_ref });
-        move_to(aptos_framework, AptosCoinMintCapability { mint_cap });
-    }
-
-    /// Migrate an existing chain from the legacy `AptosCoinMintCapability` (coin `MintCapability`)
-    /// to `AptosFAMintCapabilities` (FA `MintRef`), so gas refunds mint APT FA directly without
-    /// touching the legacy coin supply aggregator. Gated by the aptos_framework signer (governance).
-    public entry fun convert_to_aptos_fa_mint_ref(
-        aptos_framework: &signer
-    ) acquires AptosCoinMintCapability {
-        system_addresses::assert_aptos_framework(aptos_framework);
-        let mint_cap = &AptosCoinMintCapability[@aptos_framework].mint_cap;
-        let mint_ref = coin::get_paired_mint_copy_ref(mint_cap);
-        move_to(aptos_framework, AptosFAMintCapabilities { mint_ref });
+        move_to(aptos_framework, AptosCoinMintCapability { mint_cap })
     }
 
     /// Called by epilogue only.
