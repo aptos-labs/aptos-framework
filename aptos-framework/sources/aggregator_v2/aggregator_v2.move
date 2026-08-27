@@ -200,14 +200,12 @@ module aptos_framework::aggregator_v2 {
     // ===== DEPRECATE/NOT YET IMPLEMENTED ====
 
     #[deprecated]
-    public fun copy_snapshot<IntElement: copy + drop>(_snapshot: &AggregatorSnapshot<IntElement>): AggregatorSnapshot<IntElement> {
-        abort error::invalid_state(EAGGREGATOR_FUNCTION_NOT_YET_SUPPORTED)
-    }
+    /// NOT YET IMPLEMENTED, always raises EAGGREGATOR_FUNCTION_NOT_YET_SUPPORTED.
+    public native fun copy_snapshot<IntElement: copy + drop>(snapshot: &AggregatorSnapshot<IntElement>): AggregatorSnapshot<IntElement>;
 
     #[deprecated]
-    public fun string_concat<IntElement>(_before: String, _snapshot: &AggregatorSnapshot<IntElement>, _after: String): AggregatorSnapshot<String> {
-        abort error::invalid_state(EAGGREGATOR_FUNCTION_NOT_YET_SUPPORTED)
-    }
+    /// DEPRECATED, use derive_string_concat() instead. always raises EAGGREGATOR_FUNCTION_NOT_YET_SUPPORTED.
+    public native fun string_concat<IntElement>(before: String, snapshot: &AggregatorSnapshot<IntElement>, after: String): AggregatorSnapshot<String>;
 
     #[verify_only]
     fun verify_aggregator_try_add_sub(): Aggregator<u64> {

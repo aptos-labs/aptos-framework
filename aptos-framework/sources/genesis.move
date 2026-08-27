@@ -236,11 +236,9 @@ module aptos_framework::genesis {
     ) {
         let unique_accounts = vector::empty();
 
-        // TODO(#20391): restore `for_each_ref` when effectful HOF verification
-        // supports efficient caller-provided induction invariants.
-        for (i in 0..employees.length()) {
+        employees.for_each_ref(|employee_group| {
             let j = 0;
-            let employee_group = employees.borrow(i);
+            let employee_group: &EmployeeAccountMap = employee_group;
             let num_employees_in_group = vector::length(&employee_group.accounts);
 
             let buy_ins = simple_map::create();
@@ -316,9 +314,7 @@ module aptos_framework::genesis {
             if (employee_group.validator.join_during_genesis) {
                 initialize_validator(pool_address, validator);
             };
-        } spec {
-            invariant exists<stake::ValidatorSet>(@aptos_framework);
-        };
+        });
     }
 
     fun create_initialize_validators_with_commission(

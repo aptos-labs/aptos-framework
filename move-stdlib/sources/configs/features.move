@@ -995,15 +995,6 @@ module std::features {
         is_enabled(LAZY_MODULE_INITIALIZATION)
     }
 
-    /// Rejects publishing new modules that would run eager `init_module`. Modules must
-    /// use a newer compiler with lazy initialization support instead.
-    /// Lifetime: permanent
-    const DISABLE_EAGER_MODULE_INITIALIZATION: u64 = 130;
-
-    public fun is_eager_module_initialization_disabled(): bool {
-        is_enabled(DISABLE_EAGER_MODULE_INITIALIZATION)
-    }
-
     // ============================================================================================
     // Feature Flag Implementation
 
@@ -1044,14 +1035,12 @@ module std::features {
             move_to<Features>(framework, Features { features: vector[] })
         };
         let features = &mut Features[@std].features;
-        // `for_each_ref` is not supported in verification since
-        // bit-vector integer mutation is unsupported (TODO(#20375)).
-        for (i in 0..enable.length()) {
-            set(features, enable[i], true);
-        };
-        for (i in 0..disable.length()) {
-            set(features, disable[i], false);
-        };
+        enable.for_each_ref(|feature| {
+            set(features, *feature, true);
+        });
+        disable.for_each_ref(|feature| {
+            set(features, *feature, false);
+        });
     }
 
     /// Enable and disable features for the next epoch.

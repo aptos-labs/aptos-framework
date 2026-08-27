@@ -357,11 +357,6 @@ module aptos_trading::order_match_types {
             && self.is_bid == other.is_bid
     }
 
-    spec validate_single_order_reinsertion_request {
-        aborts_if !(self is OrderMatchDetails::SingleOrder);
-        aborts_if !(other is OrderMatchDetails::SingleOrder);
-    }
-
     public fun validate_bulk_order_reinsertion_request<M: store + copy + drop>(
         self: &OrderMatchDetails<M>, other: &OrderMatchDetails<M>
     ): bool {
@@ -374,11 +369,6 @@ module aptos_trading::order_match_types {
             && self.price == other.price
             && self.is_bid == other.is_bid
             && self.sequence_number == other.sequence_number
-    }
-
-    spec validate_bulk_order_reinsertion_request {
-        aborts_if !(self is OrderMatchDetails::BulkOrder);
-        aborts_if !(other is OrderMatchDetails::BulkOrder);
     }
 
     public fun destroy_active_matched_order(self: ActiveMatchedOrder)

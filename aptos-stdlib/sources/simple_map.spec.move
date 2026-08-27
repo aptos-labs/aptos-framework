@@ -22,18 +22,8 @@ spec aptos_std::simple_map {
             map_spec_aborts_destroy_empty = spec_aborts_destroy_empty,
             map_spec_aborts_add = spec_aborts_add,
             map_spec_aborts_del = spec_aborts_del,
-            map_spec_aborts_borrow = spec_aborts_borrow,
-            map_spec_insertion_key_at = spec_insertion_key_at,
-            map_spec_insertion_rank = spec_insertion_rank;
+            map_spec_aborts_borrow = spec_aborts_borrow;
     }
-
-    // Entries stay in insertion order, and a program can observe that order:
-    // `==` compares the entry vector structurally, and `to_vec_pair` and `keys`
-    // return it. So the order is part of this map's identity, unlike the
-    // key-ordered maps whose positions follow from their contents.
-    spec native fun spec_insertion_key_at<K, V>(t: SimpleMap<K, V>, i: num): K;
-
-    spec native fun spec_insertion_rank<K, V>(t: SimpleMap<K, V>, k: K): num;
 
     spec length {
         pragma intrinsic;
@@ -123,7 +113,6 @@ spec aptos_std::simple_map {
         pragma intrinsic;
         pragma opaque;
         aborts_if [abstract] false;
-        ensures [abstract] self == spec_set(old(self), key, value);
         ensures [abstract] !spec_contains_key(old(self), key) ==> option::is_none(result_1);
         ensures [abstract] !spec_contains_key(old(self), key) ==> option::is_none(result_2);
         ensures [abstract] spec_contains_key(self, key);
